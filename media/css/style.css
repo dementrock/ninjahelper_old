@@ -28,7 +28,7 @@
 #output-field {
     float: left;
     margin-left: 100px;
-    margin-top: 30px;
+    width: 500px;
 }
 
 #output-field li {

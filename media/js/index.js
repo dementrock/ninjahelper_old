@@ -1,5 +1,13 @@
+$(function(){
+    $("#import-form").submit(function(){
+        fetch_data();  
+        return false;
+    });
+});
+
 function fetch_data(){
-    $.post('/account/compare_schedule/', $('#import-form').serialize(), function(data){
+    //alert(url_import_form);
+    $.post(url_import_form, $('#import-form').serialize(), function(data){
         output_str = '<h3>According to your friend list, </h3><ul>';
         for (var i = 0; i < data.length; ++i) {
             output_str += '<li>You will attend ' + data[i][0] + ' with ';

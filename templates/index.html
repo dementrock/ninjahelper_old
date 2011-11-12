@@ -3,7 +3,10 @@
 <script src="/media/js/index.js" type="text/javascript" ></script>
 {% endblock %}
 {% block content %}
-<form id="import-form" action="{% url import_course_data %}" method="post">
+<script type="text/javascript">
+    var url_import_form = "{% url compare_schedule %}";
+</script>
+<form id="import-form">
     <h3>Login As in Ninjacourses</h3>
     <div id="form-content">
         {% csrf_token %}
@@ -11,7 +14,7 @@
         <input type="text" name="username" /> <br />
         <label for="username">Password</label> <br />
         <input type="password" name="password" /> <br />
-        <input type="button" value="Import" onclick='fetch_data()' />
+        <input type="submit" value="Import" />
     </div>
 </form>
 <div id="output-field">

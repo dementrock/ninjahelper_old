@@ -67,6 +67,7 @@ def _fetch_course_data_from_page(page):
     try:
         main_schedule_entries = _get_from_schedule(page, 'view.schedules_entries')[0] # Only interested in the main schedule
     except Exception:
+        print "Error when fetching main schedule entries"
         return None
     offerings = _get_from_schedule(page, 'view.offerings')
 
@@ -128,6 +129,7 @@ def fetch_course_data(username, password):
     user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
     if user_profile.is_main_schedule_imported:
         return user_profile.course_list
+    course_list = _fetch_course_data_from_page(user_schedule_page)
     user_profile.set_main_schedule(course_list)
     return course_list
     
@@ -147,16 +149,19 @@ def fetch_compare_data(username, password):
     user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
 
     if not user_profile.is_main_schedule_imported:
-        fetch_course_data()
+        print "Need to import main schedule"
+        fetch_course_data(username, password)
+        print "Import finished"
     course_list = user_profile.course_list
     if not user_profile.is_friend_list_imported:
-        fetch_friend_data()
-    friend_list = [[str(x), x.url_as_friend, _get_course_list(user_profile=x, username=username, password=password)] for x in user_profile.friend.all()]
+        fetch_friend_data(username, password)
+    friend_list = [[str(x), x.url_as_friend, _get_course_list(user_profile=x, username=username, password=password)] for x in user_profile.friend.all() if x != user_profile]
 
     for friendly_name, course_id in course_list:
         compare_dict[friendly_name] = []
 
     for friend_name, friend_url, friend_course_list in friend_list:
+        print friend_name, friend_url, friend_course_list
         if type(friend_course_list) is list:
             for friendly_name, course_id in friend_course_list:
                 if friendly_name in compare_dict:

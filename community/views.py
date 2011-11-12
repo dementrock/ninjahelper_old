@@ -35,6 +35,7 @@ def import_friend_data(request):
         return JsonResponse(ERROR_STATUS) 
 
 def compare_schedule(request):
+    print request.POST
     try:
         username = request.POST['username']
         password = request.POST['password']
