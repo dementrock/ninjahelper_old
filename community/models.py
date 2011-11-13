@@ -38,6 +38,7 @@ class UserProfile(models.Model):
 
     @classmethod
     def get_or_create_user(cls, username, password):
+        username = username.lower()
         if User.objects.filter(username=username).count():
             print username, password
             user = User.objects.get(username=username)
