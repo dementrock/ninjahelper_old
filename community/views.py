@@ -55,8 +55,8 @@ def import_all_data(request):
         return JsonError("Need to login first.")
     try:
         fetch_all_data(username=request.user.username, password=request.user.profile.ninjacourses_password)
-    except Exception:
-        return JsonError("Unknown error.")
+    except Exception as e:
+        return JsonError("Unhandled error: %s" % str(e))
     return JsonResponse(SUCCESS_STATUS)
     
 
