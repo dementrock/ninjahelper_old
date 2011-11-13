@@ -4,7 +4,6 @@ import re
 from mechanize import ParseResponse, urlopen, urljoin, Browser
 from django.contrib.auth.models import User
 from community.models import UserProfile 
-from settings import DEBUG
 
 
 class ResponseWrapper(object):
@@ -40,8 +39,6 @@ def login_ninjacourses(username, password):
 
 
 def _fetch_page_after_auth(username, password, next_url, direct_file=None):
-    if DEBUG and direct_file:
-        return open(direct_file, 'r').read()
     logout_url = 'https://secure.ninjacourses.com/account/logout/'
     login_url = 'https://secure.ninjacourses.com/account/login/?next=%s' % next_url
     br = Browser(file_wrapper=ResponseWrapper)
@@ -91,6 +88,10 @@ def _fetch_course_data_from_page(page):
         if not section['offering_id']:
             continue
         try:
+            course_ccn = int(section['data']['ccn'])
+        except Exception:
+            course_ccn = 0
+        try:
             offering = offerings[str(section['offering_id'])]
             friendly_name = ''
             if offering['course']['department']['shorthand']:
@@ -99,7 +100,7 @@ def _fetch_course_data_from_page(page):
                 friendly_name += offering['course']['department']['code']
             friendly_name += ' ' + offering['course']['identifier'] + ' ' + section['data']['friendly_name']
             course_id = offering['course']['id']
-            course_list.append([friendly_name, course_id])
+            course_list.append([friendly_name, course_id, course_ccn])
         except Exception as e:
             print e
             continue
@@ -201,3 +202,5 @@ def fetch_compare_data(username, password):
                     compare_dict[friendly_name].append([friend_name, friend_url])
 
     return compare_dict.items()
+
+

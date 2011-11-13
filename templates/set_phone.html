@@ -8,22 +8,18 @@
 
 </script>
 
-<form id="monitor-form" action="{% url monitor_course %}" method="post">
+<form id="phone-form">
+    <h3>You need to set up your phone number first (we only support att currently).</h3>
+    <div id="course">
+        {{ course.friendly_name }}
+    </div>
     <div id="form-content">
         {% csrf_token %}
-        <label for="ccn">Course CCN</label> <br />
-        <input type="text" name="ccn" /> <br />
         <label for="cell-phone">Cell Phone</label> <br />
-        <input type="text" name="cellphone" /> <br />
+        <input type="text" name="cell-phone" /> <br />
         <input type="submit" name="submit" value="Submit" />
     </div>
 </form>
-
-<div id="course-list">
-{% for course in request.user.profile.course.all %}
-<a href="{% url add_monitor_course course.course_ccn%}">{{ course.friendly_name }}</a><br />
-{% endfor %}
-</div>
 
 <div id="note">
 </div>

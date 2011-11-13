@@ -9,6 +9,9 @@ SUCCESS_STATUS = {'status': 'success'}
 def generate_username():
     return uuid.uuid4().hex[0:30]
 
+def generate_password():
+    return uuid.uuid4().hex[0:16]
+
 class JsonResponse(HttpResponse):
     def __init__(self, data):
         content = simplejson.dumps(data, indent=2, ensure_ascii=False)

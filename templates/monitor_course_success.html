@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block scripts %}
+<link rel="stylesheet" href="/media/css/monitor.css" />
+{% endblock %}
+{% block content %}
+{% if success %}
+The course is added to the monitor list.
+{% else %}
+Fuck
+{% endif %}
+{% endblock %}

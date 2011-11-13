@@ -1,22 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
-import smtplib
-import urllib
-from common.utils import generate_password
+from fetch import find_info
+from gmail import send_message
+
 # Create your models here.
 
 class MainScheduleCourse(models.Model):
     friendly_name = models.CharField(max_length=100)
     course_id = models.IntegerField()
-    course_ccn = models.IntegerField()
 
     def __unicode__(self):
-        return self.friendly_name 
+        return self.friendly_name
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, related_name='profile')
     ninjacourses_password = models.CharField(max_length=100)
     course = models.ManyToManyField(MainScheduleCourse, through='ScheduleManager', related_name='user_profile')
+    monitor_course = models.ManyToManyField(MainScheduleCourse, through='CourseMonitor', related_name='user_profile')
     is_main_schedule_imported = models.BooleanField(default=False)
     is_friend_list_imported = models.BooleanField(default=False)
 
@@ -24,9 +24,6 @@ class UserProfile(models.Model):
 
     url_as_friend = models.CharField(max_length=100, blank=True)
     realname = models.CharField(max_length=100, blank=True)
-
-    cellphone = models.CharField(max_length=30, blank=True, default='0')
-    cell_mail = models.CharField(max_length=100, blank=True, default='txt.att.net')
 
     def __unicode__(self):
         if self.realname:
@@ -39,24 +36,23 @@ class UserProfile(models.Model):
     @classmethod
     def get_or_create_user(cls, username, password):
         if User.objects.filter(username=username).count():
-            print username, password
             user = User.objects.get(username=username)
             if password:
                 print "Setting password"
                 user.profile.set_password(password)
             user_profile = user.profile
-            print user.username, user.password, user.profile.ninjacourses_password
+            print user.username, user.password
         else:
             user = User.objects.create_user(username=username, email='', password=password)
             user_profile = UserProfile.objects.create(user=user, ninjacourses_password=password)
         return user, user_profile
 
-    def add_course(self, friendly_name, course_id, course_ccn):
+    def add_course(self, friendly_name, course_id):
         print friendly_name, course_id
         if MainScheduleCourse.objects.filter(friendly_name=friendly_name).count():
             course = MainScheduleCourse.objects.get(friendly_name=friendly_name)
         else:
-            course = MainScheduleCourse.objects.create(friendly_name=friendly_name, course_id=course_id, course_ccn=course_ccn)
+            course = MainScheduleCourse.objects.create(friendly_name=friendly_name, course_id=course_id)
         ScheduleManager.objects.create(user_profile=self, course=course)
 
     def update(self, realname, url_as_friend):
@@ -67,7 +63,7 @@ class UserProfile(models.Model):
         self.save()
 
     def add_friend(self, username, realname, url_as_friend):
-        user, user_profile = UserProfile.get_or_create_user(username=username, password=generate_password())
+        user, user_profile = UserProfile.get_or_create_user(username=username, password='')
         user_profile.update(realname=realname, url_as_friend=url_as_friend)
         self.friend.add(user_profile)
 
@@ -94,8 +90,8 @@ class UserProfile(models.Model):
         self.set_main_schedule_imported()
         ScheduleManager.objects.filter(user_profile=self).delete() 
         if type(course_list) is list:
-            for friendly_name, course_id, course_ccn in course_list:
-                self.add_course(friendly_name=friendly_name, course_id=course_id, course_ccn=course_ccn)
+            for friendly_name, course_id in course_list:
+                self.add_course(friendly_name=friendly_name, course_id=course_id)
         self.save()
         print "finished"
 
@@ -112,9 +108,7 @@ class UserProfile(models.Model):
         self.save()
 
     def set_password(self, password):
-        print "Setting..."
         self.user.set_password(password)
-        self.user.save()
         self.ninjacourses_password = password
         self.save()
 
@@ -125,105 +119,60 @@ class ScheduleManager(models.Model):
     def __unicode__(self):
         return '%s is taking %s' % (str(self.user_profile), str(self.course))
 
-def _analyze_num(s):
-    l = len(s)
-    num_list = []
-    i = 0
-    while i < l: 
-        try:
-            n = int(s[i])
-            flag = True
-            t = 2
-            while flag:
-                try:
-                    n = int(s[i:i + t])
-                    t += 1
-                except ValueError:
-                    num_list.append(n)
-                    i += t
-                    flag = False
-        except ValueError:
-            i += 1
-    return num_list
-
-def _find_info(number):
-    f = urllib.urlopen("http://infobears.berkeley.edu:3400/osc/?_InField1=RESTRIC&_InField2=%d&_InField3=12B4" % number)
-    temp = f.read()
-    a , b  = temp.find('<blockquote>'), temp.find('</blockquote>')
-    temp_string = temp[a : b]
-    has_wait_list = (temp_string.find('does not use a Waiting List') == -1)
-    return _analyze_num(temp_string), has_wait_list  
-
-def _send_message(toaddrs='peterqian1993@hotmail.com', msg='nothing'):
-    print toaddrs, msg
-
-    fromaddr = 'ninjahelperberkeley@gmail.com'     
-    # Credentials (if needed)  
-    username = 'ninjahelperberkeley@gmail.com'  
-    password = 'hack123456'  
-
-    # The actual mail send  
-    server = smtplib.SMTP('smtp.gmail.com:587')  
-    server.starttls()  
-    server.login(username,password)  
-    print "Sending..."
-    server.sendmail(fromaddr, toaddrs, msg)  
-    print "Message sent"
-    server.quit() 
-
 class CourseMonitor(models.Model):
 
     user_profile = models.ForeignKey(UserProfile)
-
-    ccn = models.IntegerField(max_length=100)
+    course = models.ForeignKey(MainScheduleCourse)
 
     current_enroll = models.IntegerField(default=-1)
     enroll_limit = models.IntegerField(default=-1)
-    current_waitlist = models.IntegerField(default=-1)
+    cur_waitlist = models.IntegerField(default=-1)
     waitlist_limit = models.IntegerField(default=-1)
     has_waitlist = models.BooleanField(default=True)
     all_full = models.BooleanField(default=False)
 
     is_first_time = models.BooleanField(default=True)
 
+    @property
+    def ccn(self):
+        return self.course.ccn
+
     def fetch(self):
         # given a ccn, a cellphone number and a studentname
-        print "running?"
-        info_list, has_waitlist = _find_info(self.ccn)
-        current_enroll, enroll_limit, current_waitlist, waitlist_limit = -1, -1, -1, -1
+        info_list, has_waitlist = find_info(self.ccn)
+        current_enroll, enrolled, current_waitlist, wl_limit = -1, -1, -1, -1
         all_full = False
         if has_waitlist:  # if this class has waitlist
             if len(info_list) == 4:
-                current_enroll, enroll_limit, current_waitlist, waitlist_limit = info_list
+                current_enroll, enrolled, current_waitlist, wl_limit = info_list
             elif len(info_list) == 2:
-                current_waitlist, waitlist_limit = info_list
+                current_waitlist, wl_limit = info_list
             elif len(info_list) == 0:
                 all_full = True
         else:
             if len(info_list) == 4:
-                current_enroll, enroll_limit, current_waitlist, waitlist_limit = info_list
+                current_enroll, enrolled, current_waitlist, wl_limit = info_list
             elif len(info_list) == 2:
-                current_enroll, enroll_limit = info_list
+                current_enroll, enrolled = info_list
             elif len(info_list) == 0:
                 all_full = True
-        print current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist
-        is_different = self.update(current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist)
+        is_different = self.update(current_enroll, enrolled, current_waitlist, wl_limit, all_full, has_waitlist)
         if is_different:
-            cell_mail = '%s@%s' % (self.user_profile.cellphone, self.user_profile.cell_mail)
-            msg = "There has been a change of status in your monitoring course with CCN %d." % self.ccn
-            _send_message(toaddrs=cell_mail, msg=msg)
+            send_message()
 
 
     def update(self, *args):
+        current_enroll=-1, enrolled=-1, current_waitlist=-1, wl_limit=-1, all_full=False, has_waitlist=True):
         assert len(args) == 6, "What??"
-        name_list = ["current_enroll", "enroll_limit", "current_waitlist", "waitlist_limit", "all_full", "has_waitlist"]
+        name_list = ["current_enroll", "enrolled", "current_waitlist", "wl_limit", "all_full", "has_waitlist"]
         is_different = False
-        for index in range(0, len(name_list)):
+        for index in range(0, len(args_list)):
             arg = args[index]
             arg_name = name_list[index]
             if not self.is_first_time and hasattr(self, arg_name) and arg != getattr(self, arg_name):
                 is_different = True
             setattr(self, arg_name, arg)
-        self.is_first_time = False
-        self.save()
         return is_different
+
+    # if there is any difference
+    sendmessage(cellphone, message)

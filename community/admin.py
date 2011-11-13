@@ -5,3 +5,4 @@ from community.models import *
 admin.site.register(UserProfile)
 admin.site.register(ScheduleManager)
 admin.site.register(MainScheduleCourse)
+admin.site.register(CourseMonitor)
