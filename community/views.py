@@ -16,12 +16,14 @@ def login(request):
         if request.user.is_authenticated():
             return JsonError("Already logged in.")
         try:
-            username = request.POST['username']
+            username = request.POST['username'].lower()
             password = request.POST['password']
         except Exception:
             return JsonError("Must provide both username and password.")
         if not username or not password:
             return JsonError("Must provide both username and password.")
+        if '@' in username:
+            return JsonError("Please use your username instead of email address.")
         auth_successful = login_ninjacourses(username=username, password=password)
         print auth_successful
         if not auth_successful:
