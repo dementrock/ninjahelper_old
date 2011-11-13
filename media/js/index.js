@@ -1,13 +1,17 @@
-$(function(){
-    $("#import-form").submit(function(){
-        fetch_data();  
-        return false;
-    });
-});
+function fetch_all_data() {
 
-function fetch_data(){
-    //alert(url_import_form);
-    $.post(url_import_form, $('#import-form').serialize(), function(data){
+    $.post(url_import_all, $("#csrf-form").serialize(), function(data) {
+        if (data.status == 'error') {
+            $('#note').html(data.message);
+        } else {
+            $('#note').html("Successfully imported. Redirecting...");
+            location.reload();
+        }
+    }, 'json');
+}
+
+function compare_schedule(){
+    $.post(url_compare_schedule, $('#csrf-form').serialize(), function(data){
         output_str = '<h3>According to your friend list, </h3><ul>';
         for (var i = 0; i < data.length; ++i) {
             output_str += '<li>You will attend ' + data[i][0] + ' with ';
@@ -34,10 +38,7 @@ function fetch_data(){
             }
         }
         output_str += '</ul>';
-        $('#output-field').html(output_str);
+        $('#note').html(output_str);
         
-        /*for (var i = 0; i < data.length; ++i) {
-            alert(data[i][0] + data[i][1]);
-        }*/
     }, 'json');
 }

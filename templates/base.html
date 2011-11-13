@@ -1,3 +1,4 @@
+{% load ninjahelper_tags %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -14,19 +15,25 @@
   <body>
     <div id="main-body">
     <div id="header">
-      
+        <div id="statusbar" class="module">
+            {% ifloggedin %}
+            <a href='{% url logout %}'>Log Out</a>
+            {% endifloggedin %}
+        </div>
       <div id="title">
         <h1><a href="/">Ninja Helper</a></h1>
       </div>
-
-<ul id="nav">
-	<li><a href="http://ninjacourses.com">Go to Ninja Courses</a></li>
-</ul>
-
+      <ul id="nav">
+        <li><a href="http://ninjacourses.com">Go to Ninja Courses</a></li>
+      </ul>
       <div style="clear: both; height: 0px; width: 0px;"></div>
     </div>
     <div id="content">
+        {% ifloggedin %}
+        <h2> Welcome, {{ request.user }}!</h2>
+        {% else %}
         <h2>Welcome to Ninja Helper!</h2>
+        {% endifloggedin %}
         {% block content %} {% endblock %}
     </div>
   </body>

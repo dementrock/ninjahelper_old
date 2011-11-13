@@ -3,14 +3,23 @@ from django.shortcuts import render_to_response, redirect
 from django.utils import simplejson
 import uuid
 
-ERROR_STATUS = {'status': 'Error'}
+ERROR_STATUS = {'status': 'error'}
+SUCCESS_STATUS = {'status': 'success'}
 
 def generate_username():
     return uuid.uuid4().hex[0:30]
 
 class JsonResponse(HttpResponse):
     def __init__(self, data):
-        print data
         content = simplejson.dumps(data, indent=2, ensure_ascii=False)
-        print content
         super(JsonResponse, self).__init__(content=content)
+
+class JsonError(JsonResponse):
+    def __init__(self, error_msg):
+        data = ERROR_STATUS
+        data['message'] = error_msg
+        super(JsonError, self).__init__(data=data)
+
+def xrender(request, template_url, args):
+    args['request'] = request
+    return render_to_response(template_url, args)

@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 {% block scripts %}
 <script src="/media/js/index.js" type="text/javascript" ></script>
+<link rel="stylesheet" href="/media/css/index.css" />
 {% endblock %}
 {% block content %}
 <script type="text/javascript">
-    var url_import_form = "{% url compare_schedule %}";
+    var url_import_all = "{% url import_all_data %}";
+    var url_compare_schedule = "{% url compare_schedule %}";
 </script>
-<form id="import-form">
-    <h3>Login As in Ninjacourses</h3>
-    <div id="form-content">
-        {% csrf_token %}
-        <label for="username">Username</label> <br />
-        <input type="text" name="username" /> <br />
-        <label for="username">Password</label> <br />
-        <input type="password" name="password" /> <br />
-        <input type="submit" value="Import" />
-    </div>
+
+<form id="csrf-form" style="display:none">
+    {% csrf_token %}
 </form>
-<div id="output-field">
-    </div>
+
+{% if request.user.profile.is_all_imported %}
+<a href="javascript:compare_schedule()">Compare your schedule with your friends</a> <br />
+<a href="{% url monitor_course %}">Monitor a course</a>
+{% else %}
+You haven't imported all data from ninjacourses yet. <a href="javascript:fetch_all_data()">Import now!</a>
+{% endif%}
+
+<div id="note"></div>
+
 {% endblock %}

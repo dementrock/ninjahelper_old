@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block scripts %}
+<script src="/media/js/login.js" type="text/javascript" ></script>
+<link rel="stylesheet" href="/media/css/login.css" />
+{% endblock %}
+{% block content %}
+<script type="text/javascript">
+    var url_login = "{% url login %}";
+
+</script>
+<form id="monitor-form">
+    <div id="form-content">
+        {% csrf_token %}
+        <label for="ccn">Course CCN</label> <br />
+        <input type="text" name="ccn" /> <br />
+        <label for="cell-phone">Cell Phone</label> <br />
+        <input type="text" name="cell-phone" /> <br />
+        <input type="submit" name="login" value="Log In" />
+    </div>
+</form>
+
+<div id="note">
+</div>
+{% endblock %}

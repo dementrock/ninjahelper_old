@@ -29,18 +29,29 @@ class ResponseWrapper(object):
     def geturl(self):
         return self._url
 
+def login_ninjacourses(username, password):
+    try:
+        result_page = _fetch_page_after_auth(username=username, password=password, next_url='/')
+    except Exception:
+        return False
+    UserProfile.get_or_create_user(username=username, password=password)
+    return True
+    
+
+
 def _fetch_page_after_auth(username, password, next_url, direct_file=None):
     if DEBUG and direct_file:
         return open(direct_file, 'r').read()
-    url = 'https://secure.ninjacourses.com/account/login/?next=%s' % next_url
-    print url
+    logout_url = 'https://secure.ninjacourses.com/account/logout/'
+    login_url = 'https://secure.ninjacourses.com/account/login/?next=%s' % next_url
     br = Browser(file_wrapper=ResponseWrapper)
     br.set_handle_robots(False)
-    br.open(url)
+    br.open(logout_url)
+    br.open(login_url)
     br.select_form()
     br['username'], br['password'] = username, password
     result_page = br.submit().read()
-    #print result_page
+    br.close()
     if 'correct username' in result_page:
         raise ValueError
     return result_page
@@ -69,7 +80,10 @@ def _fetch_course_data_from_page(page):
     except Exception:
         print "Error when fetching main schedule entries"
         return None
-    offerings = _get_from_schedule(page, 'view.offerings')
+    try:
+        offerings = _get_from_schedule(page, 'view.offerings')
+    except Exception as e:
+        print e
 
     course_list = []
 
@@ -109,6 +123,7 @@ def _fetch_friend_list_from_page(page):
         except Exception as e:
             friend_url = ''
         friend_list.append([username, name, friend_url])
+    print friend_list
     return friend_list
 
 def _get_course_list(user_profile, username, password):
@@ -130,10 +145,13 @@ def fetch_course_data(username, password):
     if user_profile.is_main_schedule_imported:
         return user_profile.course_list
     course_list = _fetch_course_data_from_page(user_schedule_page)
+    print "Fetched course list"
+    print course_list
     user_profile.set_main_schedule(course_list)
     return course_list
     
 def fetch_friend_data(username, password):
+    print "Fetching friend %s, %s" % (username, password)
     friend_list_page = _fetch_user_friend_list_page(username, password)
     user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
     if user_profile.is_friend_list_imported:
@@ -141,6 +159,21 @@ def fetch_friend_data(username, password):
     friend_list = _fetch_friend_list_from_page(friend_list_page)
     user_profile.set_friend_list(friend_list)
     return friend_list 
+
+def fetch_all_data(username, password):
+    print username, password
+    user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
+    print user, user_profile
+    if not user_profile.is_main_schedule_imported:
+        course_list = fetch_course_data(username, password)
+    else:
+        course_list = user_profile.course_list
+    print "Fetched course data"
+    if not user_profile.is_friend_list_imported:
+        print "Fetching friend data"
+        fetch_friend_data(username, password)
+    for friend_profile in user_profile.friend.all():
+        _get_course_list(user_profile=friend_profile, username=username, password=password)
 
 def fetch_compare_data(username, password):
 
@@ -168,4 +201,3 @@ def fetch_compare_data(username, password):
                     compare_dict[friendly_name].append([friend_name, friend_url])
 
     return compare_dict.items()
-

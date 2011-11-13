@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block scripts %}
+<script src="/media/js/login.js" type="text/javascript" ></script>
+<link rel="stylesheet" href="/media/css/login.css" />
+{% endblock %}
+{% block content %}
+<script type="text/javascript">
+    var url_login = "{% url login %}";
+
+</script>
+<form id="login-form">
+    <h3>Log In</h3>
+    <div id="form-content">
+        {% csrf_token %}
+        <label for="username">Username</label> <br />
+        <input type="text" name="username" /> <br />
+        <label for="username">Password</label> <br />
+        <input type="password" name="password" /> <br />
+        <input type="submit" name="login" value="Log In" />
+    </div>
+</form>
+
+<div id="note">
+    Note: Use the same username and password as in ninjacourses.
+</div>
+{% endblock %}

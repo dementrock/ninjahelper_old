@@ -21,7 +21,7 @@ Well this is self explanatory :)
 Course Shortlink
 ----------------
 
-Provide a custom shortlink for each courses, e.g. http://ninjahelper.com/dementrock/math53 --> http://math.berkeley.edu/~auroux/53f11/.
+Provide a custom shortlink for each course, e.g. http://ninjahelper.com/dementrock/math53 --> http://math.berkeley.edu/~auroux/53f11/.
 
 Course Page Monitor
 -------------------

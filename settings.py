@@ -2,7 +2,7 @@
 
 import os.path
 
-DEBUG = True
+DEBUG = False 
 TEMPLATE_DEBUG = DEBUG
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -127,6 +127,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'ninjahelper.community',
     'ninjahelper.root',
+    'ninjahelper.common',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -16,6 +16,7 @@ class UserProfile(models.Model):
     course = models.ManyToManyField(MainScheduleCourse, through='ScheduleManager', related_name='user_profile')
     is_main_schedule_imported = models.BooleanField(default=False)
     is_friend_list_imported = models.BooleanField(default=False)
+
     friend = models.ManyToManyField('self')
 
     url_as_friend = models.CharField(max_length=100, blank=True)
@@ -26,19 +27,25 @@ class UserProfile(models.Model):
             return self.realname
         return self.user.username
 
+    def is_all_imported(self):
+        return self.is_main_schedule_imported and self.is_friend_list_imported
+
     @classmethod
     def get_or_create_user(cls, username, password):
         if User.objects.filter(username=username).count():
             user = User.objects.get(username=username)
             if password:
-                user.set_password(password)
+                print "Setting password"
+                user.profile.set_password(password)
             user_profile = user.profile
+            print user.username, user.password
         else:
             user = User.objects.create_user(username=username, email='', password=password)
             user_profile = UserProfile.objects.create(user=user, ninjacourses_password=password)
         return user, user_profile
 
     def add_course(self, friendly_name, course_id):
+        print friendly_name, course_id
         if MainScheduleCourse.objects.filter(friendly_name=friendly_name).count():
             course = MainScheduleCourse.objects.get(friendly_name=friendly_name)
         else:
@@ -59,7 +66,10 @@ class UserProfile(models.Model):
 
     @property
     def course_list(self):
+        print "searching"
+        print self.is_main_schedule_imported
         assert self.is_main_schedule_imported, 'Need to import main schedule first'
+        print self.course.all()
         return [[x.friendly_name, x.course_id] for x in self.course.all()]
 
 
@@ -73,12 +83,14 @@ class UserProfile(models.Model):
         self.save()
 
     def set_main_schedule(self, course_list):
-        self.is_main_schedule_imported = True
+        print "Setting main schedule"
+        self.set_main_schedule_imported()
         ScheduleManager.objects.filter(user_profile=self).delete() 
         if type(course_list) is list:
             for friendly_name, course_id in course_list:
                 self.add_course(friendly_name=friendly_name, course_id=course_id)
         self.save()
+        print "finished"
 
     def set_friend_list(self, friend_list):
         self.is_friend_list_imported = True
@@ -92,9 +104,20 @@ class UserProfile(models.Model):
         self.is_friend_list_imported = True
         self.save()
 
+    def set_password(self, password):
+        self.user.set_password(password)
+        self.ninjacourses_password = password
+        self.save()
+
 class ScheduleManager(models.Model):
     user_profile = models.ForeignKey(UserProfile)
     course = models.ForeignKey(MainScheduleCourse)
 
     def __unicode__(self):
         return '%s is taking %s' % (str(self.user_profile), str(self.course))
+
+class CourseToMonitor(models.Model):
+    cur_enroll = models.IntegerField(blank=True)
+    enrull_limit = models.IntegerField(blank=True)
+    cur_waitlist = models.IntegerField(blank=True)
+    waitlist_limit = models.IntegerField(blank=True)
