@@ -102,7 +102,7 @@ class UserProfile(models.Model):
 
     def set_friend_list(self, friend_list):
         self.is_friend_list_imported = True
-        self.friend.all().delete()
+        self.friend.clear()
         if type(friend_list) is list:
             for username, realname, url_as_friend in friend_list:
                 self.add_friend(username=username, realname=realname, url_as_friend=url_as_friend)
