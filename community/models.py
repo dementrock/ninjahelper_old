@@ -67,6 +67,10 @@ class UserProfile(models.Model):
             self.url_as_friend = url_as_friend
         self.save()
 
+    def set_phone(self, cellphone):
+        self.cellphone = cellphone
+        self.save()
+
     def add_friend(self, username, realname, url_as_friend):
         user, user_profile = UserProfile.get_or_create_user(username=username, password=generate_password())
         user_profile.update(realname=realname, url_as_friend=url_as_friend)

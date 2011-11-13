@@ -92,7 +92,9 @@ def monitor_course(request):
         try:
             cellphone = request.POST['cellphone']
             ccn = request.POST['ccn']
-            CourseMonitor.objects.create(user_profile=request.user.profile, ccn=int(ccn))
+            user_profile = request.user.profile
+            user_profile.set_phone(cellphone)
+            CourseMonitor.objects.create(user_profile=user_profile, ccn=int(ccn))
             params = {}
             params.update(csrf(request))
             params['ccn'] = ccn
