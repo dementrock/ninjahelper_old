@@ -4,7 +4,7 @@ import re
 from mechanize import ParseResponse, urlopen, urljoin, Browser
 from django.contrib.auth.models import User
 from community.models import UserProfile 
-
+import django.contrib.auth as auth
 
 class ResponseWrapper(object):
     filter_rules = {'<div class="form_div">': '',
@@ -29,6 +29,9 @@ class ResponseWrapper(object):
         return self._url
 
 def login_ninjacourses(username, password):
+    user = auth.authenticate(username=username, password=password)
+    if user:
+        return True
     try:
         result_page = _fetch_page_after_auth(username=username, password=password, next_url='/')
     except Exception:

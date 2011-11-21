@@ -6,9 +6,9 @@
 {% block content %}
 <script type="text/javascript">
     var url_login = "{% url login %}";
-
+    var url_next = "{{ next }}";
 </script>
-<form id="login-form">
+<form id="login-form" class="form">
     <h3>Log In</h3>
     <div id="form-content">
         {% csrf_token %}

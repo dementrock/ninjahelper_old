@@ -8,6 +8,7 @@ urlpatterns = patterns('community.views',
 	url(r'^import_all_data/$', "import_all_data", name='import_all_data'),
 	url(r'^compare_schedule/$', "compare_schedule", name='compare_schedule'),
 	url(r'^monitor_course/$', "monitor_course", name='monitor_course'),
-	#url(r'^monitor_course/add$', "monitor_course", name='monitor_course'),
     url(r'^monitor_course/add/(?P<course_ccn>\d+)/$', 'add_monitor_course', name='add_monitor_course'),
+    url(r'^shortlink/$', 'manage_shortlink', name='manage_shortlink'),
+    url(r'^shortlink/add/$', 'add_shortlink', name='add_shortlink'),
 )

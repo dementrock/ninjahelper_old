@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^$', index, name="index"),
     url(r'^test/$', test, name="test"),
     url(r'^account/', include('community.urls')),
+    url(r'^(?P<shortname>\w+)/$', 'community.views.shortlink'),
 )
 
 urlpatterns += patterns('', (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_DOC_ROOT}),)

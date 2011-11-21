@@ -1,43 +1,56 @@
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 import django.contrib.auth as auth
+import root.views
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from community.utils import fetch_course_data, fetch_all_data, fetch_friend_data, fetch_compare_data, login_ninjacourses
 from common.utils import JsonResponse, JsonError, ERROR_STATUS, SUCCESS_STATUS, xrender
-from community.models import MainScheduleCourse, CourseMonitor
+from community.models import MainScheduleCourse, CourseMonitor, ShortLink
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 import hashlib
 
 def login(request):
-    try:
-        if request.user.is_authenticated():
-            return JsonError("Already logged in.")
+    if request.method == 'POST':
         try:
-            username = request.POST['username'].lower()
-            password = request.POST['password']
+            if request.user.is_authenticated():
+                return JsonError("Already logged in.")
+            try:
+                username = request.POST['username'].lower()
+                password = request.POST['password']
+            except Exception:
+                return JsonError("Must provide both username and password.")
+            if not username or not password:
+                return JsonError("Must provide both username and password.")
+            if '@' in username:
+                return JsonError("Please use your username instead of email address.")
+            auth_successful = login_ninjacourses(username=username, password=password)
+            print auth_successful
+            if not auth_successful:
+                return JsonError("We failed to authenticate your account on ninjacourses. Either the information is incorrect or the ninjacourses server is down.")
+            print "getting user"
+            print username, password
+            user = auth.authenticate(username=username, password=password)
+            print user
+            print "logging in"
+            auth.login(request, user)
+            return JsonResponse(SUCCESS_STATUS)
+        except Exception as e:
+            print e
+            return JsonError("Unknown error.")
+    else:
+        params = {}
+        try:
+            params['next'] = request.GET['next']
         except Exception:
-            return JsonError("Must provide both username and password.")
-        if not username or not password:
-            return JsonError("Must provide both username and password.")
-        if '@' in username:
-            return JsonError("Please use your username instead of email address.")
-        auth_successful = login_ninjacourses(username=username, password=password)
-        print auth_successful
-        if not auth_successful:
-            return JsonError("We failed to authenticate your account on ninjacourses. Either the information is incorrect or the ninjacourses server is down.")
-        print "getting user"
-        print username, password
-        user = auth.authenticate(username=username, password=password)
-        print user
-        print "logging in"
-        auth.login(request, user)
-        return JsonResponse(SUCCESS_STATUS)
-    except Exception as e:
-        print e
-        return JsonError("Unknown error.")
+            params['next'] = '/'
+        params.update(csrf(request))
+        if request.user.is_authenticated():
+            return redirect('index')
+        else:
+            return xrender(request, 'login.html', params)
 
 
 def import_course_data(request):
@@ -74,6 +87,7 @@ def import_friend_data(request):
         print e
         return JsonResponse(ERROR_STATUS) 
 
+@login_required
 def compare_schedule(request):
     if not request.user.is_authenticated():
         return JsonError("Need to login first.")
@@ -82,11 +96,13 @@ def compare_schedule(request):
     except Exception:
         return JsonError("Unknown error.")
 
+@login_required
 def logout(request):
     if request.user.is_authenticated():
         auth.logout(request)
     return redirect('index')
 
+@login_required
 def monitor_course(request):
     if request.method == 'POST':
         try:
@@ -115,6 +131,7 @@ def monitor_course(request):
         print e
         return HttpResponse('fuck')
 
+@login_required
 def add_monitor_course(request, course_ccn):
     user = request.user
     params = {}
@@ -126,3 +143,30 @@ def add_monitor_course(request, course_ccn):
     if user.profile.cellphone == '0':
         return xrender(request, 'set_phone.html', params)
     return HttpResponse(str(course_ccn))
+
+@login_required
+def manage_shortlink(request):
+    params = {}
+    params.update(csrf(request))
+    return xrender(request, 'manage_shortlink.html', params)
+
+
+@login_required
+def add_shortlink(request):
+    try:
+        shortname = request.POST['shortname']
+        url = request.POST['url']
+        user_profile = request.user.profile
+        ShortLink.objects.create(shortname=shortname, url=url, user_profile=user_profile)
+        return JsonResponse(SUCCESS_STATUS)
+    except Exception as e:
+        print e
+        return JsonError('Unknown error')
+
+@login_required
+def shortlink(request, shortname):
+    try:
+        linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
+        return redirect(linkobj)
+    except Exception:
+        return redirect('index')

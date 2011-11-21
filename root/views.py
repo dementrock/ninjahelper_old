@@ -9,6 +9,7 @@ from common.utils import xrender
 from mechanize import Browser
 import hashlib
 
+@login_required
 def index(request):
     params = {}
     params.update(csrf(request))

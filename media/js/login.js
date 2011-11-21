@@ -5,15 +5,20 @@ $(function(){
         if (username == "" || password == "") {
             $("#note").html("Must provide both username and password.");
         }
+        processing("Logging in...");
         $.post(url_login, $("#login-form").serialize(), function(data) {
             if (data.status == 'error') {
                 $("#note").html(data.message);
             } else {
                 $("#note").html("Log in success. Redirecting...")
-                location.reload();
+                window.location.replace(url_next);
             }
         }, 'json');
         return false;
     });
+    function processing(msg) {
+        $("#note").html("<img id='processing' src='/media/processing.gif' />" + msg);
+    }
 });
+
 

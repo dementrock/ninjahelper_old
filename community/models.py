@@ -232,3 +232,8 @@ class CourseMonitor(models.Model):
         self.is_first_time = False
         self.save()
         return is_different
+
+class ShortLink(models.Model):
+    user_profile = models.ForeignKey(UserProfile)
+    shortname = models.CharField(max_length=100)
+    url = models.CharField(max_length=100)
