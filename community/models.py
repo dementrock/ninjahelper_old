@@ -123,6 +123,10 @@ class UserProfile(models.Model):
         self.ninjacourses_password = password
         self.save()
 
+    @property
+    def shortlink(self):
+        return ShortLink.objects.filter(user_profile=self)
+
 class ScheduleManager(models.Model):
     user_profile = models.ForeignKey(UserProfile)
     course = models.ForeignKey(MainScheduleCourse)

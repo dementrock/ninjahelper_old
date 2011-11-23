@@ -166,3 +166,4 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 LOGIN_URL = '/account/login/'
+handler404 = 'root.views.error'

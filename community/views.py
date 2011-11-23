@@ -167,6 +167,26 @@ def add_shortlink(request):
 def shortlink(request, shortname):
     try:
         linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
-        return redirect(linkobj)
-    except Exception:
+        return redirect(linkobj.url)
+    except Exception as e:
+        print e
+        return redirect('error')
+
+
+@login_required
+def edit_shortlink(request, shortname):
+    try:
+        linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
+        return redirect(linkobj.url)
+    except Exception as e:
+        print e
+        return redirect('index')
+
+@login_required
+def delete_shortlink(request, shortname):
+    try:
+        linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
+        return redirect(linkobj.url)
+    except Exception as e:
+        print e
         return redirect('index')

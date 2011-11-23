@@ -9,6 +9,15 @@
     var url_add_shortlink = "{% url add_shortlink %}";
 </script>
 
+<div id="currentlist">
+    <div id="currentlist-head">Current List</div>
+    {% for shortlink in request.user.profile.shortlink %}
+    <div class="list-item">
+        <div class="shortname">{{ shortlink.shortname }}</div>
+        <div class="linkurl">{{ shortlink.url }}</div>
+    </div>
+    {% endfor %}
+
 <form id="form" method="post" class="form">
     <div id="form-content">
         {% csrf_token %}

@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
-from root.views import index, test
+from root.views import index, test, error
 from django.contrib import admin
 import settings
 admin.autodiscover()
@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', index, name="index"),
     url(r'^test/$', test, name="test"),
+    url(r'^error/$', error, name="error"),
     url(r'^account/', include('community.urls')),
     url(r'^(?P<shortname>\w+)/$', 'community.views.shortlink'),
 )

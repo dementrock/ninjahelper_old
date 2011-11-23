@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block scripts %}
+<link rel="stylesheet" href="/media/css/error.css" />
+{% endblock %}
+{% block content %}
+
+<div class="errormsg">
+    {% if error_message %}
+        {{ error_message }}
+    {% else %}
+    There is an unknown error on this page. <br /><a href="/">Back to home</a>
+    {% endif %}
+</div>
+
+<div class="errorimg">
+    <img src='/media/404.gif' />
+</div>
+
+
+{% endblock %}

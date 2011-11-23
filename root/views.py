@@ -26,3 +26,6 @@ def test(request):
     print br.response()
     print br
     return HttpResponse(br.read())
+
+def error(request):
+    return xrender(request, 'error.html', {})

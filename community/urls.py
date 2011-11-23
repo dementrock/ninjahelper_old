@@ -11,4 +11,6 @@ urlpatterns = patterns('community.views',
     url(r'^monitor_course/add/(?P<course_ccn>\d+)/$', 'add_monitor_course', name='add_monitor_course'),
     url(r'^shortlink/$', 'manage_shortlink', name='manage_shortlink'),
     url(r'^shortlink/add/$', 'add_shortlink', name='add_shortlink'),
+    url(r'^shortlink/edit/(?P<shortname>\w+)/$', 'edit_shortlink', name='edit_shortlink'),
+    url(r'^shortlink/delete/(?P<shortname>\w+)/$', 'delete_shortlink', name='delete_shortlink'),
 )
