@@ -240,4 +240,4 @@ class CourseMonitor(models.Model):
 class ShortLink(models.Model):
     user_profile = models.ForeignKey(UserProfile)
     shortname = models.CharField(max_length=100)
-    url = models.CharField(max_length=100)
+    url = models.URLField(max_length=100)

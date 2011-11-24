@@ -7,9 +7,10 @@
     <meta name="language" content="en-US" />
     <title>Ninja Helper</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Rammetto+One' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Niconne&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="http://media.ninjacourses.com/css/style.css" />
     <link rel="stylesheet" href="http://media.ninjacourses.com/css/ninjacourses.css" />
-    <link rel="stylesheet" href="/media/css/style.css" />
     <link rel="stylesheet" href="/media/css/style.css" />
     {% block scripts %} {% endblock %}
   </head>
@@ -30,11 +31,7 @@
       <div style="clear: both; height: 0px; width: 0px;"></div>
     </div>
     <div id="content">
-        {% ifloggedin %}
-        <h2> Welcome, {{ request.user }}!</h2>
-        {% else %}
-        <h2>Welcome to Ninja Helper!</h2>
-        {% endifloggedin %}
+        <div class="welcome">{% ifloggedin %}Welcome, {{ request.user }}!{% else %}Welcome to Ninja Helper!{% endifloggedin %}</div>
         {% block content %} {% endblock %}
     </div>
   </body>

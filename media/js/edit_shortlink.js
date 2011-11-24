@@ -8,13 +8,13 @@ $(function(){
         shortname = $("#form :input[name=shortname]").val();
         url = $("#form :input[name=url]").val();
         processing("Processing...");
-        $.post(url_add_shortlink, $("#form").serialize(), function(data) {
+        $.post(url_edit_shortlink, $("#form").serialize(), function(data) {
             if (data.status == 'error') {
                 $("#note").html(data.message);
                 form_submitted = false;
             } else {
                 $("#note").html(data.message);
-                location.reload();
+                form_submitted = false;
             }
         }, 'json');
         return false;
@@ -24,3 +24,5 @@ $(function(){
     }
 
 });
+
+

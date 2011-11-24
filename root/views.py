@@ -17,15 +17,3 @@ def index(request):
         return xrender(request, 'index.html', params)
     else:
         return xrender(request, 'login.html', params)
-
-def test(request):
-    url = 'http://ninjacourses.com'
-    br = Browser()
-    br.set_handle_robots(False)
-    br.open(url)
-    print br.response()
-    print br
-    return HttpResponse(br.read())
-
-def error(request):
-    return xrender(request, 'error.html', {})

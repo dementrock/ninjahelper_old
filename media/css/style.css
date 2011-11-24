@@ -1,9 +1,9 @@
 #title a {
+   font-family: 'Rammetto One', cursive;
    font-size: 30px;
    color: black;
    text-decoration: none;
-   font-weight: bold;
-   text-shadow: 3px 1px 4px white;
+   text-shadow: 3px 1px 4px #DDD;
 }
 
 #import-form {
@@ -25,6 +25,14 @@
     min-height: 400px;
 }
 
+.welcome {
+    font-family: 'Niconne', cursive;
+    font-size: 40px;
+    border-bottom: 2px solid #F0F0F0;
+    margin-bottom: 15px;
+    padding-bottom: 3px;
+}
+
 #output-field {
     float: left;
     margin-left: 100px;
@@ -42,11 +50,10 @@
 
 #note {
     float: left;
-    width: 500px;
+    width: 350px;
     font-size: 20px;
-    margin-top: 70px;
     font-family: times;
-    margin-left: 150px;
+    margin-left: 20px;
 }
 
 #processing {
@@ -65,3 +72,91 @@
     height: 20px;
 }
 
+.errorimg {
+    float: right;
+}
+
+.errorimg img {
+    height: 300px;
+}
+
+.errormsg {
+    font-size: 20px;
+    float: left;
+    width: 400px;
+    margin-top: 100px;
+    margin-left: 100px;
+    line-height: 40px;
+}
+
+#loginbtn {
+    border: none;
+    background-image: url('/media/arrow_yellow.png');
+}
+
+a {
+    text-decoration: none;
+}
+
+.leftbar {
+    height: 300px;
+    float: left;
+    width: 350px;
+}
+
+#currentlist {
+    width: 300px;
+    float: left;
+}
+
+a.backtolist {
+    float: right;
+}
+.form-header{
+    font-size: 23px;
+    text-shadow: 1px 1px 2px #BBB;
+}
+
+.list-item div {
+    float: left;
+}
+
+.item-url {
+    width: 150px;
+}
+
+.item-url a {
+    font-style: italic;
+}
+
+.list-items {
+    margin-top: 20px;
+}
+
+.list-item {
+    height: 20px;
+    font-size: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.item-edit, .item-delete {
+    width: 50px;
+}
+
+#course-list a {
+    text-decoration: none;
+    display: block;
+    border-radius: 5px;
+    border: 1px solid black;
+    width: 300px;
+    font-size: 18px;
+    height: 28px;
+    text-align: center;
+    padding-top: 10px;
+    color: #FFF3B8;
+    background-color: #4B4B4B;
+    font-weight: bold;
+    text-shadow: 1px 0.9px 4px white;
+    margin-left: 300px;
+}

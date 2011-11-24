@@ -5,11 +5,7 @@
 {% block content %}
 
 <div class="errormsg">
-    {% if error_message %}
-        {{ error_message }}
-    {% else %}
-    There is an unknown error on this page. <br /><a href="/">Back to home</a>
-    {% endif %}
+    {% if msg %}{{ msg }}{% else %}There is an unknown error on this page.{% endif %}<br /><a href="/">Back to home</a>
 </div>
 
 <div class="errorimg">

@@ -9,26 +9,33 @@
     var url_add_shortlink = "{% url add_shortlink %}";
 </script>
 
-<div id="currentlist">
-    <div id="currentlist-head">Current List</div>
-    {% for shortlink in request.user.profile.shortlink %}
-    <div class="list-item">
-        <div class="shortname">{{ shortlink.shortname }}</div>
-        <div class="linkurl">{{ shortlink.url }}</div>
+<div class="leftbar">
+    <form id="form" method="post" class="form">
+        <div class="form-header">Add new shortlink</div>
+        <div id="form-content">
+            {% csrf_token %}
+            <label for="shortname">Short Name</label> <br />
+            {{ form.shortname }} <br />
+            <label for="url">URL</label> <br />
+            {{ form.url }} <br />
+            <input type="submit" name="submit" value="Add" />
+        </div>
+    </form>
+    <div id="note">
     </div>
-    {% endfor %}
-
-<form id="form" method="post" class="form">
-    <div id="form-content">
-        {% csrf_token %}
-        <label for="shortname">Short Name</label> <br />
-        <input type="text" name="shortname" /> <br />
-        <label for="url">URL</label> <br />
-        <input type="text" name="url" /> <br />
-        <input type="submit" name="submit" value="Submit" />
-    </div>
-</form>
-
-<div id="note">
 </div>
+<div id="currentlist">
+    <div id="currentlist-head">Current</div>
+    <div class="list-items">
+        {% for shortlink in request.user.profile.shortlink %}
+        <div class="list-item">
+            <div class="item-url"><a href="{{ shortlink.url }}" title="{{ shortlink.url }}">{{ shortlink.shortname }}</a></div>
+            <div class="item-edit"><a href="{% url edit_shortlink shortlink.shortname %}">Edit</a></div>
+            <div class="item-delete"><a href="{% url delete_shortlink shortlink.shortname %}">Delete</a></div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
 {% endblock %}
