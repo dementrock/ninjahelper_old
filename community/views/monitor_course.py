@@ -29,20 +29,5 @@ def manage_monitor_course(request):
         params['course_list'] = request.user.profile.course_list
         return xrender(request, 'monitor_course.html', params)
     except Exception as e:
-        print e
-        return HttpResponse('fuck')
-
-@login_required
-def add_monitor_course(request, course_ccn):
-    user = request.user
-    params = {}
-    params.update(csrf(request))
-    print user.profile.cellphone
-    print MainScheduleCourse.objects.filter(course_ccn=course_ccn)
-    course = MainScheduleCourse.objects.filter(course_ccn=course_ccn)[0]
-    params['course'] = course
-    if user.profile.cellphone == '0':
-        return xrender(request, 'set_phone.html', params)
-    return HttpResponse(str(course_ccn))
-
-
+        print repr(e)
+        return redirecterror(request, 'Unknown error.')

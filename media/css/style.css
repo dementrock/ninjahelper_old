@@ -10,7 +10,7 @@
     float: left;
 }
 
-#form-content {
+.form-content {
     margin-top: 20px;
     margin-left: 20px;
 }
@@ -56,6 +56,11 @@
     margin-left: 20px;
 }
 
+#note.note-lr {
+    margin-left: 100px;
+    margin-top: 43px;
+}
+
 #processing {
     display: block;
     margin-left: 30px;
@@ -87,11 +92,6 @@
     margin-top: 100px;
     margin-left: 100px;
     line-height: 40px;
-}
-
-#loginbtn {
-    border: none;
-    background-image: url('/media/arrow_yellow.png');
 }
 
 a {

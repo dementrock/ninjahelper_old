@@ -12,7 +12,7 @@
 <div class="leftbar">
     <form id="form" method="post" class="form">
         <div class="form-header">Add new shortlink</div>
-        <div id="form-content">
+        <div class="form-content">
             {% csrf_token %}
             <label for="shortname">Short Name</label> <br />
             {{ form.shortname }} <br />

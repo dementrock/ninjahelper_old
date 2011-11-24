@@ -1,24 +1,11 @@
 $(function(){
-    $("#login-form").submit(function(){
-        username = $("#login-form :input[name=username]").val();
-        password = $("#login-form :input[name=password]").val();
-        if (username == "" || password == "") {
-            $("#note").html("Must provide both username and password.");
-        }
-        processing("Logging in...");
-        $.post(url_login, $("#login-form").serialize(), function(data) {
-            if (data.status == 'error') {
-                $("#note").html(data.message);
-            } else {
-                $("#note").html("Log in success. Redirecting...")
-                window.location.replace(url_next);
-            }
-        }, 'json');
-        return false;
-    });
-    function processing(msg) {
-        $("#note").html("<img id='processing' src='/media/processing.gif' />" + msg);
-    }
+    $("form").submit(submit_form({
+        'submit_url': url_login,
+        'success_action': function(){
+            window.location.replace(url_next);
+        },
+        'processing_msg': 'Logging in...',
+    }));
 });
 
 

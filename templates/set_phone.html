@@ -8,16 +8,13 @@
 
 </script>
 
-<form id="phone-form">
-    <h3>You need to set up your phone number first (we only support att currently).</h3>
-    <div id="course">
-        {{ course.friendly_name }}
-    </div>
-    <div id="form-content">
-        {% csrf_token %}
-        <label for="cell-phone">Cell Phone</label> <br />
-        <input type="text" name="cell-phone" /> <br />
-        <input type="submit" name="submit" value="Submit" />
+<form id="form" method="post" class="form">
+    <div class="form-header">Set your cell phone.</div>
+        <div id="form-content">
+            {% csrf_token %}
+            <label for="shortname">Cell phone</label> <br />
+            <input type="text" name="cell-phone" /> <br />
+            <input type="submit" name="submit" value="Save" />
     </div>
 </form>
 

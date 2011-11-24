@@ -10,6 +10,9 @@
 
 <form id="form" method="post" class="form">
     <div class="form-header">Edit <a class="backtolist" href="{% url manage_shortlink %}">Back to list</a></div>
+    <div class="form-content">
+        {% csrf_token %}
+        <label for="shortname">Shortname</label><br />
         {{ form.shortname }} <br />
         <label for="url">URL</label> <br />
         {{ form.url }} <br />
@@ -17,6 +20,6 @@
     </div>
 </form>
 
-<div id="note">
+<div id="note" class="note-lr">
 </div>
 {% endblock %}

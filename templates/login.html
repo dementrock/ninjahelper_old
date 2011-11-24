@@ -8,9 +8,9 @@
     var url_login = "{% url login %}";
     var url_next = "{{ next }}";
 </script>
-<form id="login-form" class="form">
-    <h3>Log In</h3>
-    <div id="form-content">
+<form id="form" class="form" method="post">
+    <div class="form-header">Log In</div>
+    <div class="form-content">
         {% csrf_token %}
         <label for="username">Username</label> <br />
         <input type="text" name="username" /> <br />
@@ -20,7 +20,7 @@
     </div>
 </form>
 
-<div id="note">
+<div id="note" class="note-lr">
     Note: Use the same username and password as in ninjacourses.
 </div>
 {% endblock %}

@@ -38,8 +38,6 @@ def login_ninjacourses(username, password):
         return False
     UserProfile.get_or_create_user(username=username, password=password)
     return True
-    
-
 
 def _fetch_page_after_auth(username, password, next_url, direct_file=None):
     logout_url = 'https://secure.ninjacourses.com/account/logout/'

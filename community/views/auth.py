@@ -1,7 +1,7 @@
 import django.contrib.auth as auth
 from django.shortcuts import redirect
 from community.utils import login_ninjacourses
-from common.utils import JsonResponse, JsonError, xrender
+from common.utils import JsonResponse, JsonError, JsonSuccess, xrender
 from django.core.context_processors import csrf
 
 def login(request):

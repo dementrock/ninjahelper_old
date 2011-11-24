@@ -8,7 +8,7 @@
 
 </script>
 
-<form id="monitor-form" action="{% url monitor_course %}" method="post">
+<form id="monitor-form" action="{% url manage_monitor_course %}" method="post">
     <div id="form-content">
         {% csrf_token %}
         <label for="ccn">Course CCN</label> <br />
@@ -18,12 +18,6 @@
         <input type="submit" name="submit" value="Submit" />
     </div>
 </form>
-
-<div id="course-list">
-{% for course in request.user.profile.course.all %}
-<a href="{% url add_monitor_course course.course_ccn%}">{{ course.friendly_name }}</a><br />
-{% endfor %}
-</div>
 
 <div id="note">
 </div>
