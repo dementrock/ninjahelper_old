@@ -160,3 +160,7 @@ a.backtolist {
     text-shadow: 1px 0.9px 4px white;
     margin-left: 300px;
 }
+
+#codeform {
+    clear: both;
+}

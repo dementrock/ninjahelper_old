@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
-from common.utils import xrender
+from common.utils import xrender, send_message
 from mechanize import Browser
 import hashlib
 
@@ -17,3 +17,8 @@ def index(request):
         return xrender(request, 'index.html', params)
     else:
         return xrender(request, 'login.html', params)
+
+@login_required
+def test(request):
+    send_message('5102772205@tmomail.net', 'test')
+    return HttpResponse('Done')

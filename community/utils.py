@@ -1,10 +1,13 @@
 import sys
 import json
 import re
+import string
+import random
 from mechanize import ParseResponse, urlopen, urljoin, Browser
 from django.contrib.auth.models import User
 from community.models import UserProfile 
 import django.contrib.auth as auth
+from common.utils import send_message
 
 class ResponseWrapper(object):
     filter_rules = {'<div class="form_div">': '',
@@ -204,4 +207,32 @@ def fetch_compare_data(username, password):
 
     return compare_dict.items()
 
+def cellphonevalid(phonenumber):
+    return phonenumber.isdigit() and len(phonenumber) == 10
 
+_cell_mail_list = [
+    #'message.alltel.com',
+    'txt.att.net',
+    #'myboostmobile.com',
+    #'messaging.nextel.com',
+    #'messaging.sprintpcs.com',
+    'tmomail.net',
+    #'email.uscc.net',
+    'vtext.com',
+    #'vmobl.com',
+]
+
+RANDOM_CODE = string.digits + string.letters
+
+def get_random_code(length=4):
+    return "".join([random.choice(RANDOM_CODE) for _ in range(length)])
+
+def send_random_code(request, cellphone):
+    request.session['code_dict'] = {'0': 'fuck'}
+    for cell_mail in _cell_mail_list:
+        random_code = '0'
+        while request.session['code_dict'].get(random_code):
+            random_code = get_random_code()
+        request.session['code_dict'][random_code] = cell_mail
+        complete_cell_mail = "{0}@{1}".format(cellphone, cell_mail)
+        send_message(toaddrs=complete_cell_mail, msg=random_code)

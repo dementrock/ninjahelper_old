@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-import smtplib
-import urllib
 from common.utils import generate_password
 # Create your models here.
 
@@ -19,6 +17,7 @@ class UserProfile(models.Model):
     course = models.ManyToManyField(MainScheduleCourse, through='ScheduleManager', related_name='user_profile')
     is_main_schedule_imported = models.BooleanField(default=False)
     is_friend_list_imported = models.BooleanField(default=False)
+    is_phone_set = models.BooleanField(default=False)
 
     friend = models.ManyToManyField('self')
 
@@ -67,8 +66,10 @@ class UserProfile(models.Model):
             self.url_as_friend = url_as_friend
         self.save()
 
-    def set_phone(self, cellphone):
+    def set_phone(self, cellphone, cellmail):
         self.cellphone = cellphone
+        self.cellmail = cellmail
+        self.is_phone_set = True
         self.save()
 
     def add_friend(self, username, realname, url_as_friend):
@@ -163,22 +164,6 @@ def _find_info(number):
     has_wait_list = (temp_string.find('does not use a Waiting List') == -1)
     return _analyze_num(temp_string), has_wait_list  
 
-def _send_message(toaddrs='peterqian1993@hotmail.com', msg='nothing'):
-    print toaddrs, msg
-
-    fromaddr = 'ninjahelperberkeley@gmail.com'     
-    # Credentials (if needed)  
-    username = 'ninjahelperberkeley@gmail.com'  
-    password = 'hack123456'  
-
-    # The actual mail send  
-    server = smtplib.SMTP('smtp.gmail.com:587')  
-    server.starttls()  
-    server.login(username,password)  
-    print "Sending..."
-    server.sendmail(fromaddr, toaddrs, msg)  
-    print "Message sent"
-    server.quit() 
 
 class CourseMonitor(models.Model):
 
@@ -220,7 +205,7 @@ class CourseMonitor(models.Model):
         if is_different:
             cell_mail = '%s@%s' % (self.user_profile.cellphone, self.user_profile.cell_mail)
             msg = "There has been a change of status in your monitoring course with CCN %d." % self.ccn
-            _send_message(toaddrs=cell_mail, msg=msg)
+            send_message(toaddrs=cell_mail, msg=msg)
 
 
     def update(self, *args):

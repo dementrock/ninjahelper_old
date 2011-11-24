@@ -1,22 +1,35 @@
 {% extends "base.html" %}
 {% block scripts %}
-<link rel="stylesheet" href="/media/css/monitor.css" />
+<script src="/media/js/set_phone.js"></script>
+<link >
 {% endblock %}
 {% block content %}
 <script type="text/javascript">
-    var url_login = "{% url login %}";
-
+    var url_set_phone = "{% url set_phone %}";
 </script>
 
-<form id="form" method="post" class="form">
+<form id="cellform" method="post" class="form">
     <div class="form-header">Set your cell phone.</div>
-        <div id="form-content">
-            {% csrf_token %}
-            <label for="shortname">Cell phone</label> <br />
-            <input type="text" name="cell-phone" /> <br />
-            <input type="submit" name="submit" value="Save" />
+    <div class="form-content">
+        {% csrf_token %}
+        <div style="display:none"><input type="text" name="type" value="get_random_code" /></div>
+        <label for="shortname">Cell phone</label> <br />
+        <input type="text" name="cellphone" value="{{cellphone}}"/> <br />
+        <input type="submit" name="get_random_code" value="Get Random Code" /> <br />
     </div>
 </form>
+
+<form id="codeform" method="post" class="form">
+    <div class="form-content">
+        {% csrf_token %}
+        <div style="display:none"><input type="text" name="type" value="submit" /></div>
+        <label for="randomcode">Random code</label> <br />
+        <input type="text" name="randomcode" /> <br />
+        <input type="submit" name="submit" value="Submit" /> <br />
+    </div>
+</form>
+
+
 
 <div id="note">
 </div>

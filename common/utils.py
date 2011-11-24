@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response, redirect
 from django.utils import simplejson
 import uuid
 import urllib
+import smtplib
 import urlparse
 import re
 
@@ -45,3 +46,21 @@ def url_valid(url):
     match_list = url_re.findall(url)
     print "Validating url", match_list
     return len(match_list) == 1 and match_list[0] == url"""
+
+def send_message(toaddrs='peterqian1993@hotmail.com', msg='nothing'):
+    print toaddrs, msg
+    fromaddr = 'njmail123@gmail.com'     
+    # Credentials (if needed)  
+    username = 'njmail123@gmail.com'  
+    password = 'ninjahelper'  
+
+    # The actual mail send  
+    server = smtplib.SMTP('smtp.gmail.com:587')  
+    server.starttls()  
+    server.login(username,password)  
+    print "Sending..."
+    server.sendmail(fromaddr, toaddrs, msg)  
+    print "Message sent"
+    server.quit() 
+
+
