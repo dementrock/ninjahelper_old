@@ -6,6 +6,9 @@ $(function(){
             return _f.apply(_f, Array.prototype.slice.apply(arguments).concat(_a.slice(arguments.length, _a.length)));
         }
     }
+    processing = function(note_id, processing_msg) {
+        $(note_id).html("<img id='processing' src='/media/processing.gif' />" + processing_msg);
+    }
     submit_form = function() {
         var form_submitted = false;
         return function(args) {

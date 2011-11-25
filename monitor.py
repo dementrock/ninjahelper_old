@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))[:-12])
 
 from community.models import CourseMonitor
 
-SLEEP_INTERVAL = 10
+SLEEP_INTERVAL = 300 
 
 while True:
     print "Fetch all again..."

@@ -2,6 +2,7 @@
 {% block scripts %}
 <script src="/media/js/index.js" type="text/javascript" ></script>
 <link rel="stylesheet" href="/media/css/index.css" />
+<link href='http://fonts.googleapis.com/css?family=Fondamento' rel='stylesheet' type='text/css'>
 {% endblock %}
 {% block content %}
 <script type="text/javascript">
@@ -13,13 +14,19 @@
     {% csrf_token %}
 </form>
 
-<a href="javascript:compare_schedule()">Compare your schedule with your friends</a> <br />
-<a href="{% url manage_monitor_course %}">Monitor a course</a> <br />
-<a href="{% url manage_shortlink %}">Manage Shortlink</a> <br />
-{% if not request.user.profile.is_phone_set %}
-    <a href="{% url set_phone %}">Set your cell phone</a> <br />
-{% endif %}
+<div class="buttonforest">
+    <div class="buttontree {% if request.user.profile.is_all_imported %}done{% else %}notdone{% endif%}">
+        <a class="helperbutton" {% if not request.user.profile.is_all_imported %}href="javascript:import_data()"{% endif %} title="Import your data from ninjacourses.com.">Import data{% if request.user.profile.is_all_imported %} (Done){% endif %}</a>
+        <!---<a class="helperbutton secondlevel" {% if request.user.profile.is_all_imported %}href="javascript:update_data()"{% endif %} title="Update your data from ninjacourses.com. Note: your friends' schedule will NOT be updated.">Update data</a>-->
+        <a class="helperbutton secondlevel" {% if request.user.profile.is_all_imported %}href="{% url compare_schedule %}"{% endif%} title="Compare your schedule with your friends.">Compare schedule</a>
+    </div>
+    <div class="buttontree {% if request.user.profile.is_phone_set %}done{% else %}notdone{% endif%}">
+        <a class="helperbutton" {% if not request.user.profile.is_phone_set %}href="{% url set_phone %}"{% endif %} title="Set up your cell phone number (we only support ATT & Tmobile right now).">Set cell phone{% if request.user.profile.is_phone_set %} (Done){% endif%}</a>
+        <a class="helperbutton secondlevel" {% if request.user.profile.is_phone_set %}href="{% url manage_monitor_course %}"{% endif%} title="Monitor the status of a course and send you a message whenever something changes">Monitor course</a>
+    </div>
+    <a class="helperbutton" href="{% url manage_shortlink %}" title="Manage shortlink">Manage shortlink</a>
+</div>
 
-<div id="note"></div>
+<div id="note" class="note-lr"></div>
 
 {% endblock %}

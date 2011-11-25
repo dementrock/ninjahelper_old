@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block scripts %}
-<link rel="stylesheet" href="/media/css/manage_shortlink.css" />
 <script src="/media/js/manage_shortlink.js" type="text/javascript" ></script>
 {% endblock %}
 {% block content %}
@@ -24,8 +23,8 @@
     <div id="note">
     </div>
 </div>
-<div id="currentlist">
-    <div id="currentlist-head">Current</div>
+<div class="currentlist">
+    <div class="currentlist-header">Current</div>
     <div class="list-items">
         {% for shortlink in request.user.profile.shortlink %}
         <div class="list-item">

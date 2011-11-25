@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from common.utils import generate_password
+from common.utils import generate_password, send_message
+import urllib
 # Create your models here.
 
 class MainScheduleCourse(models.Model):
@@ -17,6 +18,7 @@ class UserProfile(models.Model):
     course = models.ManyToManyField(MainScheduleCourse, through='ScheduleManager', related_name='user_profile')
     is_main_schedule_imported = models.BooleanField(default=False)
     is_friend_list_imported = models.BooleanField(default=False)
+    is_friend_schedule_imported = models.BooleanField(default=False)
     is_phone_set = models.BooleanField(default=False)
 
     friend = models.ManyToManyField('self')
@@ -33,7 +35,7 @@ class UserProfile(models.Model):
         return self.user.username
 
     def is_all_imported(self):
-        return self.is_main_schedule_imported and self.is_friend_list_imported
+        return self.is_main_schedule_imported and self.is_friend_list_imported and self.is_friend_schedule_imported
 
     @classmethod
     def get_or_create_user(cls, username, password):
@@ -117,6 +119,10 @@ class UserProfile(models.Model):
         self.is_friend_list_imported = True
         self.save()
 
+    def set_friend_schedule_imported(self):
+        self.is_friend_schedule_imported = True
+        self.save()
+
     def set_password(self, password):
         print "Setting..."
         self.user.set_password(password)
@@ -167,7 +173,7 @@ def _find_info(number):
 
 class CourseMonitor(models.Model):
 
-    user_profile = models.ForeignKey(UserProfile)
+    user_profile = models.ForeignKey(UserProfile, related_name='monitored_course')
 
     ccn = models.IntegerField(max_length=100)
 
@@ -179,6 +185,9 @@ class CourseMonitor(models.Model):
     all_full = models.BooleanField(default=False)
 
     is_first_time = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return "%s monitoring course ccn %d" % (str(self.user_profile), self.ccn) 
 
     def fetch(self):
         # given a ccn, a cellphone number and a studentname

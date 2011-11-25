@@ -1,10 +1,18 @@
-function fetch_all_data() {
+var is_importing = false;
 
+function import_data() {
+    if (is_importing) {
+        return;
+    }
+    is_importing = true;
+    processing("#note", "Importing...");
     $.post(url_import_all, $("#csrf-form").serialize(), function(data) {
         if (data.status == 'error') {
             $('#note').html(data.message);
+            is_importing = false;
         } else {
             $('#note').html("Successfully imported. Redirecting...");
+            is_importing = false;
             location.reload();
         }
     }, 'json');

@@ -104,7 +104,7 @@ a {
     width: 350px;
 }
 
-#currentlist {
+.currentlist {
     width: 300px;
     float: left;
 }
@@ -112,7 +112,7 @@ a {
 a.backtolist {
     float: right;
 }
-.form-header{
+.form-header, .currentlist-header {
     font-size: 23px;
     text-shadow: 1px 1px 2px #BBB;
 }
@@ -163,4 +163,65 @@ a.backtolist {
 
 #codeform {
     clear: both;
+}
+
+.done > a.helperbutton, .done > a.helperbutton:visited {
+    background-color: gold;
+}
+
+.done > a.helperbutton.secondlevel, .done > a.helperbutton.secondlevel:visited, .notdone > a.helperbutton, .notdone > a.helperbutton:visited, a.helperbutton, a.helperbutton:visited {
+    background-color: #59ea3a;
+}
+
+.notdone > a.helperbutton.secondlevel, .notdone > a.helperbutton.secondlevel:visited {
+    background-color: lightgrey;
+}
+
+a.helperbutton, a.helperbutton:visited {
+    height: 25px;
+    text-align: center;
+    width: 186px;
+    font-size: 16px;
+    border: 1px solid black;
+    border-radius: 4px;
+    margin-top: 10px;
+    padding-top: 8px;
+    color: black;
+    display: block;
+    font-family: 'Fondamento', cursive;
+}
+
+.secondlevel {
+    margin-left: 50px;
+}
+
+.buttonforest {
+    float: left;
+}
+
+.coursename {
+    font-style: italic;
+    font-weight: bold;
+    text-shadow: 1px 1px 0.1px grey;
+}
+
+.compareitem {
+    height: 23px;
+}
+
+.comparelist {
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+.noneofyourfriends {
+    font-color: #a6a6a6;
+}
+
+.forms {
+    float: left;
+}
+
+.item-ccn {
+    width: 100px;
 }

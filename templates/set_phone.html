@@ -8,29 +8,31 @@
     var url_set_phone = "{% url set_phone %}";
 </script>
 
-<form id="cellform" method="post" class="form">
-    <div class="form-header">Set your cell phone.</div>
-    <div class="form-content">
-        {% csrf_token %}
-        <div style="display:none"><input type="text" name="type" value="get_random_code" /></div>
-        <label for="shortname">Cell phone</label> <br />
-        <input type="text" name="cellphone" value="{{cellphone}}"/> <br />
-        <input type="submit" name="get_random_code" value="Get Random Code" /> <br />
-    </div>
-</form>
+<div class="forms">
+    <form id="cellform" method="post" class="form">
+        <div class="form-header">Set your cell phone.</div>
+        <div class="form-content">
+            {% csrf_token %}
+            <div style="display:none"><input type="text" name="type" value="get_random_code" /></div>
+            <label for="shortname">Cell phone</label> <br />
+            <input type="text" name="cellphone" value="{{cellphone}}"/> <br />
+            <input type="submit" name="get_random_code" value="Get Random Code" /> <br />
+        </div>
+    </form>
 
-<form id="codeform" method="post" class="form">
-    <div class="form-content">
-        {% csrf_token %}
-        <div style="display:none"><input type="text" name="type" value="submit" /></div>
-        <label for="randomcode">Random code</label> <br />
-        <input type="text" name="randomcode" /> <br />
-        <input type="submit" name="submit" value="Submit" /> <br />
-    </div>
-</form>
+    <form id="codeform" method="post" class="form">
+        <div class="form-content">
+            {% csrf_token %}
+            <div style="display:none"><input type="text" name="type" value="submit" /></div>
+            <label for="randomcode">Random code</label> <br />
+            <input type="text" name="randomcode" /> <br />
+            <input type="submit" name="submit" value="Submit" /> <br />
+        </div>
+    </form>
+</div>
 
 
 
-<div id="note">
+<div id="note" class="note-lr">
 </div>
 {% endblock %}

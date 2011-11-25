@@ -42,7 +42,7 @@ def login_ninjacourses(username, password):
     UserProfile.get_or_create_user(username=username, password=password)
     return True
 
-def _fetch_page_after_auth(username, password, next_url, direct_file=None):
+def _fetch_page_after_auth(username, password, next_url):
     logout_url = 'https://secure.ninjacourses.com/account/logout/'
     login_url = 'https://secure.ninjacourses.com/account/login/?next=%s' % next_url
     br = Browser(file_wrapper=ResponseWrapper)
@@ -59,10 +59,10 @@ def _fetch_page_after_auth(username, password, next_url, direct_file=None):
 
 
 def _fetch_user_schedule_page(username, password):
-    return _fetch_page_after_auth(username, password, '/schedule/view/', 'user_schedule_page.html')
+    return _fetch_page_after_auth(username, password, '/schedule/view/')
     
 def _fetch_user_friend_list_page(username, password):
-    return _fetch_page_after_auth(username, password, '/friends/', 'friends.html')
+    return _fetch_page_after_auth(username, password, '/friends/')
 
 def _fetch_friend_schedule_page(url, username, password):
     return _fetch_page_after_auth(username, password, url)
@@ -145,10 +145,10 @@ def _get_course_list(user_profile, username, password):
 
 
 def fetch_course_data(username, password):
-    user_schedule_page = _fetch_user_schedule_page(username, password)
     user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
     if user_profile.is_main_schedule_imported:
         return user_profile.course_list
+    user_schedule_page = _fetch_user_schedule_page(username, password)
     course_list = _fetch_course_data_from_page(user_schedule_page)
     print "Fetched course list"
     print course_list
@@ -157,10 +157,10 @@ def fetch_course_data(username, password):
     
 def fetch_friend_data(username, password):
     print "Fetching friend %s, %s" % (username, password)
-    friend_list_page = _fetch_user_friend_list_page(username, password)
     user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
     if user_profile.is_friend_list_imported:
         return user_profile.friend_list
+    friend_list_page = _fetch_user_friend_list_page(username, password)
     friend_list = _fetch_friend_list_from_page(friend_list_page)
     user_profile.set_friend_list(friend_list)
     return friend_list 
@@ -171,14 +171,16 @@ def fetch_all_data(username, password):
     print user, user_profile
     if not user_profile.is_main_schedule_imported:
         course_list = fetch_course_data(username, password)
-    else:
-        course_list = user_profile.course_list
+        user_profile.set_main_schedule_imported()
     print "Fetched course data"
     if not user_profile.is_friend_list_imported:
         print "Fetching friend data"
         fetch_friend_data(username, password)
-    for friend_profile in user_profile.friend.all():
-        _get_course_list(user_profile=friend_profile, username=username, password=password)
+        user_profile.set_friend_list_imported()
+    if not user_profile.is_friend_schedule_imported:
+        for friend_profile in user_profile.friend.all():
+            _get_course_list(user_profile=friend_profile, username=username, password=password)
+        user_profile.set_friend_schedule_imported()
 
 def fetch_compare_data(username, password):
 
@@ -210,6 +212,9 @@ def fetch_compare_data(username, password):
 def cellphonevalid(phonenumber):
     return phonenumber.isdigit() and len(phonenumber) == 10
 
+def ccnvalid(ccn):
+    return ccn and ccn.isdigit() and len(ccn) == 5
+
 _cell_mail_list = [
     #'message.alltel.com',
     'txt.att.net',
@@ -236,3 +241,23 @@ def send_random_code(request, cellphone):
         request.session['code_dict'][random_code] = cell_mail
         complete_cell_mail = "{0}@{1}".format(cellphone, cell_mail)
         send_message(toaddrs=complete_cell_mail, msg=random_code)
+
+def get_friend_expression(friend_list):
+    friend_str = ""
+    cnt_friend = len(friend_list)
+    if not cnt_friend:
+        friend_str = '<span class="noneofyourfriends">none of your friends</span>'
+    else:
+        for i in range(0, cnt_friend):
+            friend = friend_list[i]
+            if i == cnt_friend - 1 and cnt_friend > 1:
+                if cnt_friend > 2:
+                    friend_str += 'and '
+                else:
+                    friend_str += ' and '
+            friend_str += '<a href="http://ninjacourses.com%s">%s</a>' % (friend[1], friend[0])
+            if (i < cnt_friend - 1):
+                if cnt_friend > 2:
+                    friend_str += ', '
+    return friend_str
+
