@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block scripts %}
+<script src="/media/js/set_email.js"></script>
+<link >
+{% endblock %}
+{% block content %}
+<script type="text/javascript">
+    var url_set_email = "{% url set_email %}";
+</script>
+
+<div class="forms">
+    <form id="emailform" method="post" class="form">
+        <div class="form-header">Set your email.</div>
+        <div class="form-content">
+            {% csrf_token %}
+            <div style="display:none"><input type="text" name="type" value="get_random_code" /></div>
+            <label for="shortname">Email address</label> <br />
+            <input type="text" name="email" /> <br />
+            <input type="submit" name="get_random_code" value="Get Random Code" /> <br />
+        </div>
+    </form>
+
+    <form id="codeform" method="post" class="form">
+        <div class="form-content">
+            {% csrf_token %}
+            <div style="display:none"><input type="text" name="type" value="submit" /></div>
+            <label for="randomcode">Random code (or click the link in the email)</label> <br />
+            <input type="text" name="randomcode" /> <br />
+            <input type="submit" name="submit" value="Submit" /> <br />
+        </div>
+    </form>
+</div>
+
+
+
+<div id="note" class="note-lr">
+</div>
+{% endblock %}

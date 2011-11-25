@@ -15,16 +15,20 @@
 </form>
 
 <div class="buttonforest">
-    <div class="buttontree {% if request.user.profile.is_all_imported %}done{% else %}notdone{% endif%}">
-        <a class="helperbutton" {% if not request.user.profile.is_all_imported %}href="javascript:import_data()"{% endif %} title="Import your data from ninjacourses.com.">Import data{% if request.user.profile.is_all_imported %} (Done){% endif %}</a>
-        <!---<a class="helperbutton secondlevel" {% if request.user.profile.is_all_imported %}href="javascript:update_data()"{% endif %} title="Update your data from ninjacourses.com. Note: your friends' schedule will NOT be updated.">Update data</a>-->
-        <a class="helperbutton secondlevel" {% if request.user.profile.is_all_imported %}href="{% url compare_schedule %}"{% endif%} title="Compare your schedule with your friends.">Compare schedule</a>
+    <div class="buttontree">
+        {{ request.user.profile.str_btn_import_data|safe }} 
+        {{ request.user.profile.str_btn_update_data|safe }} 
+        {{ request.user.profile.str_btn_compare_schedule|safe }}
     </div>
-    <div class="buttontree {% if request.user.profile.is_phone_set %}done{% else %}notdone{% endif%}">
-        <a class="helperbutton" {% if not request.user.profile.is_phone_set %}href="{% url set_phone %}"{% endif %} title="Set up your cell phone number (we only support ATT & Tmobile right now).">Set cell phone{% if request.user.profile.is_phone_set %} (Done){% endif%}</a>
-        <a class="helperbutton secondlevel" {% if request.user.profile.is_phone_set %}href="{% url manage_monitor_course %}"{% endif%} title="Monitor the status of a course and send you a message whenever something changes">Monitor course</a>
+    <div class="buttontree">
+        {{ request.user.profile.str_btn_set_phone|safe }} <span class="or">or</span>
+        {{ request.user.profile.str_btn_set_email|safe }}
+        {{ request.user.profile.str_btn_monitor_course|safe }}
+        {{ request.user.profile.str_btn_monitor_course_page|safe }}
     </div>
-    <a class="helperbutton" href="{% url manage_shortlink %}" title="Manage shortlink">Manage shortlink</a>
+    <div class="buttontree">
+        {{ request.user.profile.str_btn_manage_shortlink|safe }}
+    </div>
 </div>
 
 <div id="note" class="note-lr"></div>

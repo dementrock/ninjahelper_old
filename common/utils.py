@@ -40,7 +40,7 @@ def xrender(request, template_url, args):
 def redirecterror(request, msg=''):
     return xrender(request, 'error.html', {'msg': msg})
 
-def url_valid(url):
+def urlvalid(url):
     return url.startswith('http://') or url.startswith('https://')
     """url_re = re.compile('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
     match_list = url_re.findall(url)
@@ -49,10 +49,11 @@ def url_valid(url):
 
 def send_message(toaddrs='peterqian1993@hotmail.com', msg='nothing'):
     print toaddrs, msg
-    fromaddr = 'njmail123@gmail.com'     
+    from settings import EMAIL_SENDER_ADDRS, EMAIL_SENDER_PASSWORD
+    fromaddr = EMAIL_SENDER_ADDRS
     # Credentials (if needed)  
-    username = 'njmail123@gmail.com'  
-    password = 'ninjahelper'  
+    username = EMAIL_SENDER_ADDRS
+    password = EMAIL_SENDER_PASSWORD
 
     # The actual mail send  
     server = smtplib.SMTP('smtp.gmail.com:587')  
@@ -62,5 +63,3 @@ def send_message(toaddrs='peterqian1993@hotmail.com', msg='nothing'):
     server.sendmail(fromaddr, toaddrs, msg)  
     print "Message sent"
     server.quit() 
-
-

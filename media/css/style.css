@@ -165,16 +165,20 @@ a.backtolist {
     clear: both;
 }
 
-.done > a.helperbutton, .done > a.helperbutton:visited {
+.helperbutton.gold {
     background-color: gold;
 }
 
-.done > a.helperbutton.secondlevel, .done > a.helperbutton.secondlevel:visited, .notdone > a.helperbutton, .notdone > a.helperbutton:visited, a.helperbutton, a.helperbutton:visited {
+.helperbutton.green {
     background-color: #59ea3a;
 }
 
-.notdone > a.helperbutton.secondlevel, .notdone > a.helperbutton.secondlevel:visited {
+.helperbutton.grey {
     background-color: lightgrey;
+}
+
+a.helperbutton.both {
+    display: inline-block;
 }
 
 a.helperbutton, a.helperbutton:visited {
@@ -224,4 +228,9 @@ a.helperbutton, a.helperbutton:visited {
 
 .item-ccn {
     width: 100px;
+}
+
+.or {
+    font-size: 19px;
+    font-family: 'Fondamento', cursive;
 }

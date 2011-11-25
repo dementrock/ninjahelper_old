@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from common.utils import JsonResponse, JsonError, JsonSuccess, xrender, redirecterror, url_valid
+from common.utils import JsonResponse, JsonError, JsonSuccess, xrender, redirecterror, urlvalid
 from community.models import ShortLink
 from django.core.context_processors import csrf
 from community.forms import ShortLinkForm
@@ -22,7 +22,7 @@ def add_shortlink(request):
         shortname = request.POST['shortname']
         user_profile = request.user.profile
         url = request.POST['url']
-        if not url_valid(url):
+        if not urlvalid(url):
             return JsonError('Url format incorrect (common mistake: must start with http or https)')
         if ShortLink.objects.filter(shortname=shortname, user_profile=user_profile).count():
             return JsonError('Name already in use.')
@@ -57,7 +57,7 @@ def edit_shortlink(request, shortname):
         shortname = request.POST['shortname']
         linkobj = link_obj_list[0]
         print url
-        if not url_valid(url):
+        if not urlvalid(url):
             return JsonError('Url format incorrect (common mistake: must start with http or https)')
         if linkobj.shortname != shortname and ShortLink.objects.filter(shortname=shortname, user_profile=user_profile).count():
             return JsonError('Name already in use.')

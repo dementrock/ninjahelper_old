@@ -1,24 +1,25 @@
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 from common.utils import JsonResponse, JsonError, JsonSuccess, xrender, redirecterror
-from community.utils import cellphonevalid, send_random_code
+from community.models import UserProfile
+from community.utils import emailvalid, send_email_verification
 from django.core.context_processors import csrf
 
 @login_required
-def set_phone(request):
-    if request.user.profile.is_phone_set:
-        return redirecterror(request, 'Your phone is already set.')
+def set_email(request):
+    if request.user.profile.is_email_set:
+        return redirecterror(request, 'Your email is already set.')
     if request.method == 'POST':
         try:
             if 'type' not in request.POST or request.POST['type'] not in ['get_random_code', 'submit', ]:
                 return JsonError('Invalid request.')
             if request.POST['type'] == 'get_random_code':
-                if 'cellphone' not in request.POST or not request.POST['cellphone']:
-                    return JsonError('Must provide cell phone number.')
-                cellphone = request.POST['cellphone']
-                if not cellphonevalid(cellphone):
-                    return JsonError('Cell phone format incorrect: must be 10 digit number without slashes.')
-                request.session['cellphone'] = cellphone
-                send_random_code(request, cellphone)
+                if 'email' not in request.POST or not request.POST['email']:
+                    return JsonError('Must provide email address.')
+                email = request.POST['email']
+                if not emailvalid(email):
+                    return JsonError('Invalid email address.')
+                send_email_verification(request, email)
                 return JsonSuccess('Random code sent.')
             else:
                 if 'randomcode' not in request.POST or not request.POST['randomcode']:
@@ -40,6 +41,15 @@ def set_phone(request):
             return JsonError('Unknown error.')
     else:
         params = {}
-        params['cellphone'] = request.session.get('cellphone', '')
         params.update(csrf(request))
-        return xrender(request, 'set_phone.html', params)
+        return xrender(request, 'set_email.html', params)
+
+def verify_email(request, code):
+    try:
+        print code
+        print request.user.profile.email_verification_code
+        UserProfile.objects.get(email_verification_code=code).set_email()
+        return redirect('index')
+    except Exception as e:
+        print repr(e)
+        return redirecterror(request, 'Invalid verification code.')

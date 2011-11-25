@@ -3,11 +3,13 @@ import json
 import re
 import string
 import random
+import uuid
 from mechanize import ParseResponse, urlopen, urljoin, Browser
 from django.contrib.auth.models import User
 from community.models import UserProfile 
 import django.contrib.auth as auth
 from common.utils import send_message
+from django.core.urlresolvers import reverse
 
 class ResponseWrapper(object):
     filter_rules = {'<div class="form_div">': '',
@@ -261,3 +263,33 @@ def get_friend_expression(friend_list):
                     friend_str += ', '
     return friend_str
 
+def emailvalid(email):
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+    try:
+        validate_email(email)
+        return True
+    except ValidationError:
+        return False
+
+def send_email_verification(request, email):
+
+    from settings import EMAIL_SENDER_ADDRS
+    from email.mime.text import MIMEText
+
+    shortcode = get_random_code()
+    emailcode = uuid.uuid4().hex
+
+    profile = request.user.profile
+    profile.email_to_verify = email
+    profile.email_short_code = shortcode
+    profile.email_verification_code = emailcode
+    profile.save()
+
+    url = 'http://ninjahelper.com' + reverse('verify_email', args=[emailcode, ])
+    msg = MIMEText("This email is sent from Ninja Helper to verify your email address. The verification code is <strong>%s</strong>, or you can click the link below:<br /> %s" % (shortcode, url))
+    msg['Subject'] = 'Email verification code from Ninja Helper'
+    msg['From'] = EMAIL_SENDER_ADDRS
+    msg['To'] = email
+    print msg.as_string()
+    send_message(email, msg.as_string()) 
