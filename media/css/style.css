@@ -107,6 +107,7 @@ a {
 .currentlist {
     width: 300px;
     float: left;
+    margin-left: 100px;
 }
 
 a.backtolist {
@@ -121,11 +122,11 @@ a.backtolist {
     float: left;
 }
 
-.item-url {
+.item-url, .item-shortname{
     width: 150px;
 }
 
-.item-url a {
+.item-url a, .item-shortname a {
     font-style: italic;
 }
 

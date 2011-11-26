@@ -23,10 +23,12 @@
     <div id="note">
     </div>
 </div>
+
+{% if request.user.profile.shortlink.count %}
 <div class="currentlist">
     <div class="currentlist-header">Current</div>
     <div class="list-items">
-        {% for shortlink in request.user.profile.shortlink %}
+        {% for shortlink in request.user.profile.shortlink.all %}
         <div class="list-item">
             <div class="item-url"><a href="{{ shortlink.url }}" title="{{ shortlink.url }}">{{ shortlink.shortname }}</a></div>
             <div class="item-edit"><a href="{% url edit_shortlink shortlink.shortname %}">Edit</a></div>
@@ -35,6 +37,8 @@
         {% endfor %}
     </div>
 </div>
+{% endif %}
 
 
 {% endblock %}
+

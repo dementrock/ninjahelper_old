@@ -125,9 +125,14 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
+    'ninjahelper.schedule',
     'ninjahelper.community',
+    'ninjahelper.coursemonitor',
+    'ninjahelper.coursepagemonitor',
+    'ninjahelper.shortlink',
     'ninjahelper.root',
     'ninjahelper.common',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -170,3 +175,7 @@ handler404 = 'root.views.error'
 
 EMAIL_SENDER_ADDRS = 'njmail123@gmail.com'
 EMAIL_SENDER_PASSWORD = 'ninjahelper'
+
+WEBSITE_URL = 'http://ninjahelper.com/'
+
+MAXIMUM_SIZE = 500000

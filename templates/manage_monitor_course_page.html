@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block scripts %}
+<script src="/media/js/manage_monitor_course_page.js" type="text/javascript" ></script>
+{% endblock %}
+{% block content %}
+<script type="text/javascript">
+    var url_add_monitor_course_page = "{% url add_monitor_course_page %}";
+</script>
+
+<div class="leftbar">
+    <form id="form" class="form" method="post">
+        <div class="form-header">Add new course page to monitor</div>
+        <div class="form-content">
+            {% csrf_token %}
+            <label for="url">Page URL</label> <br />
+            <input type="text" name="url" /> <br />
+            <label for="shortname">Short Name</label> <br />
+            <input type="text" name="shortname" /> <br />
+            <input type="submit" name="submit" value="Submit" /> <br />
+        </div>
+    </form>
+
+    <div id="note">
+    </div>
+</div>
+
+{% if request.user.profile.monitored_course_page.count %}
+<div class="currentlist">
+    <div class="currentlist-header">Current</div>
+    <div class="list-items">
+        {% for coursepagemonitor in request.user.profile.monitored_course_page.all %}
+        <div class="list-item">
+            <div class="item-shortname"><a href="{{coursepagemonitor.url}}">{{ coursepagemonitor.shortname }}</a></div>
+            <div class="item-delete"><a href="{% url delete_monitor_course_page coursepagemonitor.shortname %}">Delete</a></div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+{% endblock %}

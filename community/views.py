@@ -1,16 +1,9 @@
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 import django.contrib.auth as auth
-import root.views
-from django.shortcuts import render_to_response, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth.models import User
-from community.utils import fetch_course_data, fetch_all_data, fetch_friend_data, fetch_compare_data, login_ninjacourses
-from common.utils import JsonResponse, JsonError, ERROR_STATUS, SUCCESS_STATUS, xrender
-from community.models import MainScheduleCourse, CourseMonitor, ShortLink
-from django.contrib.auth.models import User
+from django.shortcuts import redirect
+from community.utils import login_ninjacourses
+from common.utils import JsonResponse, JsonError, JsonSuccess, xrender, emailvalid, cellphonevalid, send_random_code, send_email_verification
 from django.core.context_processors import csrf
-import hashlib
+from django.contrib.auth.decorators import login_required
 
 def login(request):
     if request.method == 'POST':
@@ -36,7 +29,7 @@ def login(request):
             print user
             print "logging in"
             auth.login(request, user)
-            return JsonResponse(SUCCESS_STATUS)
+            return JsonSuccess()
         except Exception as e:
             print e
             return JsonError("Unknown error.")
@@ -52,141 +45,91 @@ def login(request):
         else:
             return xrender(request, 'login.html', params)
 
-
-def import_course_data(request):
-    try:
-        username = request.POST['username']
-        password = request.POST['password']
-    except Exception:
-        return JsonResponse(ERROR_STATUS)
-    try:
-        return JsonResponse(fetch_course_data(username=username, password=password))
-    except Exception as e:
-        print e
-        return JsonResponse(ERROR_STATUS)
-
-def import_all_data(request):
-    if not request.user.is_authenticated():
-        return JsonError("Need to login first.")
-    try:
-        fetch_all_data(username=request.user.username, password=request.user.profile.ninjacourses_password)
-    except Exception as e:
-        return JsonError("Unhandled error: %s" % str(e))
-    return JsonResponse(SUCCESS_STATUS)
-    
-
-def import_friend_data(request):
-    try:
-        username = request.POST['username']
-        password = request.POST['password']
-    except Exception:
-        return JsonResponse(ERROR_STATUS)
-    try:
-        return JsonResponse(fetch_friend_data(username=username, password=password))
-    except Exception as e:
-        print e
-        return JsonResponse(ERROR_STATUS) 
-
-@login_required
-def compare_schedule(request):
-    if not request.user.is_authenticated():
-        return JsonError("Need to login first.")
-    try:
-        return JsonResponse(fetch_compare_data(username=request.user.username, password=request.user.profile.ninjacourses_password))
-    except Exception:
-        return JsonError("Unknown error.")
-
-@login_required
 def logout(request):
     if request.user.is_authenticated():
         auth.logout(request)
     return redirect('index')
 
 @login_required
-def monitor_course(request):
+def set_email(request):
+    if request.user.profile.is_email_set:
+        return redirecterror(request, 'Your email is already set.')
     if request.method == 'POST':
         try:
-            cellphone = request.POST['cellphone']
-            ccn = request.POST['ccn']
-            user_profile = request.user.profile
-            user_profile.set_phone(cellphone)
-            CourseMonitor.objects.create(user_profile=user_profile, ccn=int(ccn))
-            params = {}
-            params.update(csrf(request))
-            params['ccn'] = ccn
-            params['success'] = True
+            if 'type' not in request.POST or request.POST['type'] not in ['get_random_code', 'submit', ]:
+                return JsonError('Invalid request.')
+            if request.POST['type'] == 'get_random_code':
+                if 'email' not in request.POST or not request.POST['email']:
+                    return JsonError('Must provide email address.')
+                email = request.POST['email']
+                if not emailvalid(email):
+                    return JsonError('Invalid email address.')
+                send_email_verification(request, email)
+                return JsonSuccess('Random code sent.')
+            else:
+                if 'randomcode' not in request.POST or not request.POST['randomcode']:
+                    return JsonError('Must provide randomcode.')
+                randomcode = request.POST['randomcode']
+                if randomcode == request.user.profile.email_short_code:
+                    request.user.profile.set_email()
+                    return JsonSuccess('Your email is set up.')
+                else:
+                    return JsonError('Incorrect code.')
         except Exception as e:
-            print e
-            params = {}
-            params.update(csrf(request))
-            params['success'] = False
-        return xrender(request, 'monitor_course_success.html', params)
-    print "processing"
-    try:
+            print repr(e)
+            return JsonError('Unknown error.')
+    else:
         params = {}
         params.update(csrf(request))
-        params['course_list'] = request.user.profile.course_list
-        return xrender(request, 'monitor_course.html', params)
+        return xrender(request, 'set_email.html', params)
+
+def verify_email(request, code):
+    try:
+        print code
+        print request.user.profile.email_verification_code
+        UserProfile.objects.get(email_verification_code=code).set_email()
+        return redirect('index')
     except Exception as e:
-        print e
-        return HttpResponse('fuck')
+        print repr(e)
+        return redirecterror(request, 'Invalid verification code.')
 
 @login_required
-def add_monitor_course(request, course_ccn):
-    user = request.user
-    params = {}
-    params.update(csrf(request))
-    print user.profile.cellphone
-    print MainScheduleCourse.objects.filter(course_ccn=course_ccn)
-    course = MainScheduleCourse.objects.filter(course_ccn=course_ccn)[0]
-    params['course'] = course
-    if user.profile.cellphone == '0':
+def set_phone(request):
+    if request.user.profile.is_phone_set:
+        return redirecterror(request, 'Your phone is already set.')
+    if request.method == 'POST':
+        try:
+            if 'type' not in request.POST or request.POST['type'] not in ['get_random_code', 'submit', ]:
+                return JsonError('Invalid request.')
+            if request.POST['type'] == 'get_random_code':
+                if 'cellphone' not in request.POST or not request.POST['cellphone']:
+                    return JsonError('Must provide cell phone number.')
+                cellphone = request.POST['cellphone']
+                if not cellphonevalid(cellphone):
+                    return JsonError('Cell phone format incorrect: must be 10 digit number without slashes.')
+                request.session['cellphone'] = cellphone
+                send_random_code(request, cellphone)
+                return JsonSuccess('Random code sent.')
+            else:
+                if 'randomcode' not in request.POST or not request.POST['randomcode']:
+                    return JsonError('Must provide randomcode.')
+                randomcode = request.POST['randomcode']
+                cellphone = request.session.get('cellphone')
+                code_dict = request.session.get('code_dict')
+                if not cellphone or not code_dict:
+                    return JsonError('Phone number not found. Please retype your phone number and submit again.')
+                cell_mail = code_dict.get(randomcode)
+                if not cell_mail:
+                    return JsonError('Code incorrect or we do not support your phone service.')
+                request.user.profile.set_phone(cellphone, cell_mail)
+                del request.session['code_dict']
+                del request.session['cellphone']
+                return JsonSuccess('Your phone is set up.')
+        except Exception as e:
+            print repr(e)
+            return JsonError('Unknown error.')
+    else:
+        params = {}
+        params['cellphone'] = request.session.get('cellphone', '')
+        params.update(csrf(request))
         return xrender(request, 'set_phone.html', params)
-    return HttpResponse(str(course_ccn))
-
-@login_required
-def manage_shortlink(request):
-    params = {}
-    params.update(csrf(request))
-    return xrender(request, 'manage_shortlink.html', params)
-
-
-@login_required
-def add_shortlink(request):
-    try:
-        shortname = request.POST['shortname']
-        url = request.POST['url']
-        user_profile = request.user.profile
-        ShortLink.objects.create(shortname=shortname, url=url, user_profile=user_profile)
-        return JsonResponse(SUCCESS_STATUS)
-    except Exception as e:
-        print e
-        return JsonError('Unknown error')
-
-@login_required
-def shortlink(request, shortname):
-    try:
-        linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
-        return redirect(linkobj.url)
-    except Exception as e:
-        print e
-        return redirect('error')
-
-
-@login_required
-def edit_shortlink(request, shortname):
-    try:
-        linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
-        return redirect(linkobj.url)
-    except Exception as e:
-        print e
-        return redirect('index')
-
-@login_required
-def delete_shortlink(request, shortname):
-    try:
-        linkobj = ShortLink.objects.get(user_profile=request.user.profile, shortname=shortname)
-        return redirect(linkobj.url)
-    except Exception as e:
-        print e
-        return redirect('index')

@@ -1,10 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from common.utils import JsonResponse, JsonError, xrender, redirecterror, JsonSuccess
+from common.utils import JsonResponse, JsonError, xrender, redirecterror, JsonSuccess, ccnvalid
 from django.shortcuts import redirect
-from community.models import MainScheduleCourse, CourseMonitor
-from community.utils import ccnvalid
 from django.core.context_processors import csrf
+from coursemonitor.models import CourseMonitor
 
 @require_http_methods(['POST', ])
 @login_required

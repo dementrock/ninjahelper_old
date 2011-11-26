@@ -1,18 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from common.utils import generate_password, send_message
+from common.utils import generate_password, send_message, send_email, getsize, gethash
+from settings import MAXIMUM_SIZE
 import urllib
 from django.core.urlresolvers import reverse
-# Create your models here.
-
-
-class MainScheduleCourse(models.Model):
-    friendly_name = models.CharField(max_length=100)
-    course_id = models.IntegerField()
-    course_ccn = models.IntegerField()
-
-    def __unicode__(self):
-        return self.friendly_name 
 
 def _generate_free_btn(title, text, href, extra_style=''):
     raw_str = '<a class="helperbutton green %s" href="%s" title="%s">%s</a>'
@@ -36,7 +27,7 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User, unique=True, related_name='profile')
     ninjacourses_password = models.CharField(max_length=100)
-    course = models.ManyToManyField(MainScheduleCourse, through='ScheduleManager', related_name='user_profile')
+    course = models.ManyToManyField('schedule.MainScheduleCourse', through='schedule.ScheduleManager', related_name='user_profile')
 
     is_main_schedule_imported = models.BooleanField(default=False)
     is_friend_list_imported = models.BooleanField(default=False)
@@ -86,14 +77,6 @@ class UserProfile(models.Model):
             user_profile = UserProfile.objects.create(user=user, ninjacourses_password=password)
         return user, user_profile
 
-    def add_course(self, friendly_name, course_id, course_ccn):
-        print friendly_name, course_id
-        if MainScheduleCourse.objects.filter(friendly_name=friendly_name).count():
-            course = MainScheduleCourse.objects.get(friendly_name=friendly_name)
-        else:
-            course = MainScheduleCourse.objects.create(friendly_name=friendly_name, course_id=course_id, course_ccn=course_ccn)
-        ScheduleManager.objects.create(user_profile=self, course=course)
-
     def update(self, realname, url_as_friend):
         if realname:
             self.realname = realname
@@ -130,16 +113,7 @@ class UserProfile(models.Model):
         self.is_main_schedule_imported = True
         self.save()
 
-    def set_main_schedule(self, course_list):
-        print "Setting main schedule"
-        self.set_main_schedule_imported()
-        ScheduleManager.objects.filter(user_profile=self).delete() 
-        if type(course_list) is list:
-            for friendly_name, course_id, course_ccn in course_list:
-                self.add_course(friendly_name=friendly_name, course_id=course_id, course_ccn=course_ccn)
-        self.save()
-        print "finished"
-
+    
     def set_friend_list(self, friend_list):
         self.is_friend_list_imported = True
         self.friend.clear()
@@ -163,11 +137,6 @@ class UserProfile(models.Model):
         self.ninjacourses_password = password
         self.save()
 
-    @property
-    def shortlink(self):
-        return ShortLink.objects.filter(user_profile=self)
-
-        
     @property
     def str_btn_import_data(self):
         return _generate_first_level_btn (
@@ -248,113 +217,3 @@ class UserProfile(models.Model):
         self.email_verification_code = ""
         self.is_email_set = True
         self.save()
-
-
-
-class ScheduleManager(models.Model):
-    user_profile = models.ForeignKey(UserProfile)
-    course = models.ForeignKey(MainScheduleCourse)
-
-    def __unicode__(self):
-        return '%s is taking %s' % (str(self.user_profile), str(self.course))
-
-def _analyze_num(s):
-    l = len(s)
-    num_list = []
-    i = 0
-    while i < l: 
-        try:
-            n = int(s[i])
-            flag = True
-            t = 2
-            while flag:
-                try:
-                    n = int(s[i:i + t])
-                    t += 1
-                except ValueError:
-                    num_list.append(n)
-                    i += t
-                    flag = False
-        except ValueError:
-            i += 1
-    return num_list
-
-def _find_info(number):
-    f = urllib.urlopen("http://infobears.berkeley.edu:3400/osc/?_InField1=RESTRIC&_InField2=%d&_InField3=12B4" % number)
-    temp = f.read()
-    a , b  = temp.find('<blockquote>'), temp.find('</blockquote>')
-    temp_string = temp[a : b]
-    has_wait_list = (temp_string.find('does not use a Waiting List') == -1)
-    return _analyze_num(temp_string), has_wait_list  
-
-
-class CourseMonitor(models.Model):
-
-    user_profile = models.ForeignKey(UserProfile, related_name='monitored_course')
-
-    ccn = models.IntegerField(max_length=100)
-
-    current_enroll = models.IntegerField(default=-1)
-    enroll_limit = models.IntegerField(default=-1)
-    current_waitlist = models.IntegerField(default=-1)
-    waitlist_limit = models.IntegerField(default=-1)
-    has_waitlist = models.BooleanField(default=True)
-    all_full = models.BooleanField(default=False)
-
-    is_first_time = models.BooleanField(default=True)
-
-    def __unicode__(self):
-        return "%s monitoring course ccn %d" % (str(self.user_profile), self.ccn) 
-
-    def fetch(self):
-        # given a ccn, a cellphone number and a studentname
-        print "running?"
-        info_list, has_waitlist = _find_info(self.ccn)
-        current_enroll, enroll_limit, current_waitlist, waitlist_limit = -1, -1, -1, -1
-        all_full = False
-        if has_waitlist:  # if this class has waitlist
-            if len(info_list) == 4:
-                current_enroll, enroll_limit, current_waitlist, waitlist_limit = info_list
-            elif len(info_list) == 2:
-                current_waitlist, waitlist_limit = info_list
-            elif len(info_list) == 0:
-                all_full = True
-        else:
-            if len(info_list) == 4:
-                current_enroll, enroll_limit, current_waitlist, waitlist_limit = info_list
-            elif len(info_list) == 2:
-                current_enroll, enroll_limit = info_list
-            elif len(info_list) == 0:
-                all_full = True
-        print current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist
-        is_different = self.update(current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist)
-        if is_different:
-            cell_mail = '%s@%s' % (self.user_profile.cellphone, self.user_profile.cell_mail)
-            msg = "There has been a change of status in your monitoring course with CCN %d." % self.ccn
-            send_message(toaddrs=cell_mail, msg=msg)
-
-
-    def update(self, *args):
-        assert len(args) == 6, "What??"
-        name_list = ["current_enroll", "enroll_limit", "current_waitlist", "waitlist_limit", "all_full", "has_waitlist"]
-        is_different = False
-        for index in range(0, len(name_list)):
-            arg = args[index]
-            arg_name = name_list[index]
-            if not self.is_first_time and hasattr(self, arg_name) and arg != getattr(self, arg_name):
-                is_different = True
-            setattr(self, arg_name, arg)
-        self.is_first_time = False
-        self.save()
-        return is_different
-
-    
-class ShortLink(models.Model):
-    user_profile = models.ForeignKey(UserProfile)
-    shortname = models.CharField(max_length=100)
-    url = models.URLField(max_length=100)
-
-class CoursePageMonitor(models.Model):
-    user_profile = models.ForeignKey(UserProfile)
-    url = models.URLField(max_length=100)
-    hash_data = models.CharField(max_length=100)
