@@ -10,6 +10,7 @@ class MainScheduleCourse(models.Model):
 
     @classmethod
     def add_course(cls, user_profile, friendly_name, course_id, course_ccn):
+        print user_profile.is_main_schedule_imported
         print friendly_name, course_id
         if cls.objects.filter(friendly_name=friendly_name).count():
             course = cls.objects.get(friendly_name=friendly_name)
@@ -29,6 +30,7 @@ class ScheduleManager(models.Model):
         print "Setting main schedule"
         user_profile.set_main_schedule_imported()
         cls.objects.filter(user_profile=user_profile).delete() 
+        print user_profile.is_main_schedule_imported
         if type(course_list) is list:
             for friendly_name, course_id, course_ccn in course_list:
                 MainScheduleCourse.add_course(user_profile=user_profile, friendly_name=friendly_name, course_id=course_id, course_ccn=course_ccn)

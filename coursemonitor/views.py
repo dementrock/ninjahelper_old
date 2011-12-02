@@ -4,36 +4,31 @@ from common.utils import JsonResponse, JsonError, xrender, redirecterror, JsonSu
 from django.shortcuts import redirect
 from django.core.context_processors import csrf
 from coursemonitor.models import CourseMonitor
+from common.decorators import test_error
 
+@test_error
 @require_http_methods(['POST', ])
 @login_required
 def add_monitor_course(request):
-    try:
-        ccn = request.POST.get('ccn')
-        if not ccnvalid(ccn):
-            return JsonError('Invalid CCN.')
-        user_profile = request.user.profile
-        if CourseMonitor.objects.filter(user_profile=user_profile, ccn=int(ccn)).count():
-            return JsonError('Already monitored this course.')
-        CourseMonitor.objects.create(user_profile=user_profile, ccn=int(ccn))
-        return JsonSuccess()
-    except Exception as e:
-        print repr(e)
-        return JsonError('Unknown error.')
+    ccn = request.POST.get('ccn')
+    if not ccnvalid(ccn):
+        return JsonError('Invalid CCN.')
+    user_profile = request.user.profile
+    if CourseMonitor.objects.filter(user_profile=user_profile, ccn=int(ccn)).count():
+        return JsonError('Already monitored this course.')
+    CourseMonitor.objects.create(user_profile=user_profile, ccn=int(ccn))
+    return JsonSuccess()
     
-
+@test_error
 @login_required
 def manage_monitor_course(request):
     if not request.user.profile.is_phone_set:
         return redirecterror(request, 'You need to set up your cell phone first.')
-    try:
-        params = {}
-        params.update(csrf(request))
-        return xrender(request, 'manage_monitor_course.html', params)
-    except Exception as e:
-        print repr(e)
-        return redirecterror(request, 'Unknown error.')
+    params = {}
+    params.update(csrf(request))
+    return xrender(request, 'manage_monitor_course.html', params)
 
+@test_error
 @login_required
 def delete_monitor_course(request, ccn):
     user_profile = request.user.profile

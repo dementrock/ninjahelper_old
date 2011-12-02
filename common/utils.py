@@ -10,6 +10,7 @@ import re
 import string
 import random
 from django.core.urlresolvers import reverse
+from settings import MEDIA_HEADER
 
 ERROR_STATUS = {'status': 'error'}
 SUCCESS_STATUS = {'status': 'success'}
@@ -39,6 +40,7 @@ class JsonSuccess(JsonResponse):
 
 def xrender(request, template_url, args):
     args['request'] = request
+    args['media_header'] = MEDIA_HEADER
     return render_to_response(template_url, args)
 
 def redirecterror(request, msg=''):
@@ -151,3 +153,11 @@ def send_email_verification(request, email):
 
     url = urljoin(WEBSITE_URL, reverse('verify_email', args=[emailcode, ]))
     send_email(toaddrs=email, title='Email verification code from Ninja Helper', msg="This email is sent from Ninja Helper to verify your email address. The verification code is <b>%s</b>, or you can click the link below:<br />%s" % (shortcode, url), )
+
+def errorlog(e, function=None):
+    from settings import DEBUG
+    error_str = 'Error %s in function %s' % (repr(e), str(function) if function else '(unprovided)')
+    if DEBUG:
+        print (error_str)
+    else:
+        open('error_log').write(error_str)

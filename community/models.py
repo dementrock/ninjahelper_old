@@ -1,9 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from common.utils import generate_password, send_message, send_email, getsize, gethash
-from settings import MAXIMUM_SIZE
+from settings import MAXIMUM_SIZE, ENCRYPT_KEY
 import urllib
 from django.core.urlresolvers import reverse
+from Crypto.Cipher import ARC4
+import base64
 
 def _generate_free_btn(title, text, href, extra_style=''):
     raw_str = '<a class="helperbutton green %s" href="%s" title="%s">%s</a>'
@@ -26,7 +28,7 @@ def _generate_second_level_btn(title, text, href, is_prereq_done, extra_style=''
 class UserProfile(models.Model):
 
     user = models.OneToOneField(User, unique=True, related_name='profile')
-    ninjacourses_password = models.CharField(max_length=100)
+    ninjacourses_password = models.CharField(max_length=300)
     course = models.ManyToManyField('schedule.MainScheduleCourse', through='schedule.ScheduleManager', related_name='user_profile')
 
     is_main_schedule_imported = models.BooleanField(default=False)
@@ -73,11 +75,12 @@ class UserProfile(models.Model):
             user_profile = user.profile
             print user.username, user.password, user.profile.ninjacourses_password
         else:
-            user = User.objects.create_user(username=username, email='', password=password)
-            user_profile = UserProfile.objects.create(user=user, ninjacourses_password=password)
+            user = User.objects.create_user(username=username, email='', password=generate_password())
+            user_profile = UserProfile.objects.create(user=user, ninjacourses_password=generate_password())
+            user_profile.set_password(password)
         return user, user_profile
 
-    def update(self, realname, url_as_friend):
+    def update(self, realname='', url_as_friend=''):
         if realname:
             self.realname = realname
         if url_as_friend:
@@ -134,8 +137,21 @@ class UserProfile(models.Model):
         print "Setting..."
         self.user.set_password(password)
         self.user.save()
-        self.ninjacourses_password = password
+        encrypter = ARC4.new(ENCRYPT_KEY)
+        self.ninjacourses_password = base64.b64encode(encrypter.encrypt(password))
         self.save()
+
+    @property
+    def username(self):
+        return self.user.username
+
+    @property
+    def password(self):
+        print self.ninjacourses_password
+        #print decrypter.decrypt(base64.b16decode(self.ninjacourses_password))
+        decrypter = ARC4.new(ENCRYPT_KEY)
+        return decrypter.decrypt(base64.b64decode(self.ninjacourses_password))
+
 
     @property
     def str_btn_import_data(self):

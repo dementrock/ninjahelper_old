@@ -96,7 +96,7 @@ def _fetch_friend_list_from_page(page):
         except Exception as e:
             friend_url = ''
         friend_list.append([username, name, friend_url])
-    print friend_list
+    print 'friend_list: ', friend_list
     return friend_list
 
 def _get_course_list(user_profile, username, password):
@@ -112,8 +112,12 @@ def _get_course_list(user_profile, username, password):
     return course_list
 
 
-def fetch_course_data(username, password):
-    user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
+def fetch_course_data(user_profile):
+
+    username = user_profile.username
+    password = user_profile.password
+    user = user_profile.user
+
     if user_profile.is_main_schedule_imported:
         return user_profile.course_list
     user_schedule_page = _fetch_user_schedule_page(username, password)
@@ -123,41 +127,64 @@ def fetch_course_data(username, password):
     ScheduleManager.set_main_schedule(user_profile=user_profile, course_list=course_list)
     return course_list
     
-def fetch_friend_data(username, password):
+def fetch_friend_data(user_profile):
+
+    username = user_profile.username
+    password = user_profile.password
+    user = user_profile.user
+
+
     print "Fetching friend %s, %s" % (username, password)
-    user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
+    #user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
+    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     if user_profile.is_friend_list_imported:
         return user_profile.friend_list
+    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     friend_list_page = _fetch_user_friend_list_page(username, password)
+    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     friend_list = _fetch_friend_list_from_page(friend_list_page)
+    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     user_profile.set_friend_list(friend_list)
+    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    user_profile.save()
     return friend_list 
 
-def fetch_all_data(username, password):
+def fetch_all_data(user_profile):
+
+    username = user_profile.username
+    password = user_profile.password
+    user = user_profile.user
     print username, password
-    user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
-    print user, user_profile
+
+    #user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
+    print user, user_profile, user_profile.is_main_schedule_imported
     if not user_profile.is_main_schedule_imported:
-        course_list = fetch_course_data(username, password)
-    print "Fetched course data"
+        course_list = fetch_course_data(user_profile)
+    print "Fetched course data", user, user_profile, user_profile.is_main_schedule_imported
     if not user_profile.is_friend_list_imported:
         print "Fetching friend data"
-        fetch_friend_data(username, password)
+        fetch_friend_data(user_profile)
+        print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
         user_profile.set_friend_list_imported()
+        print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    #return
     if not user_profile.is_friend_schedule_imported:
         for friend_profile in user_profile.friend.all():
             _get_course_list(user_profile=friend_profile, username=username, password=password)
         user_profile.set_friend_schedule_imported()
 
-def fetch_compare_data(username, password):
+def fetch_compare_data(user_profile):
+
+    username = user_profile.username
+    password = user_profile.password
 
     compare_dict = {}
-    
-    user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
+
+    user = user_profile.user
 
     if not user_profile.is_main_schedule_imported:
         print "Need to import main schedule"
-        fetch_course_data(username, password)
+        fetch_course_data(user_profile)
         print "Import finished"
     course_list = user_profile.course_list
     if not user_profile.is_friend_list_imported:
