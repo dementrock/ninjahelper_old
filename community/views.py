@@ -5,6 +5,7 @@ from common.utils import JsonResponse, JsonError, JsonSuccess, xrender, emailval
 from common.decorators import test_error
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
+from community.models import UserProfile
 
 @test_error
 def login(request):

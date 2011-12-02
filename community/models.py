@@ -194,8 +194,8 @@ class UserProfile(models.Model):
     @property
     def str_btn_compare_schedule(self):
         return _generate_second_level_btn (
-            title="Compare your schedule with your friends.",
-            text="Compare schedule",
+            title="Find out who will attend the same class with you.",
+            text="Find Classmates",
             href=reverse('compare_schedule'),
             is_prereq_done=self.is_all_imported,
         )

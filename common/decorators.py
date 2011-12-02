@@ -1,4 +1,4 @@
-from common.utils import JsonError, errorlog
+from common.utils import JsonError, errorlog, redirecterror
 
 def test_error(fn):
     def decorator(request, *args, **kwargs):

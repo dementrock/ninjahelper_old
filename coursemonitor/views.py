@@ -22,8 +22,8 @@ def add_monitor_course(request):
 @test_error
 @login_required
 def manage_monitor_course(request):
-    if not request.user.profile.is_phone_set:
-        return redirecterror(request, 'You need to set up your cell phone first.')
+    if not request.user.profile.is_contact_set:
+        return redirecterror(request, 'You need to set up your cell phone or email first.')
     params = {}
     params.update(csrf(request))
     return xrender(request, 'manage_monitor_course.html', params)

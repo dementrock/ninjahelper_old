@@ -12,10 +12,13 @@ from coursemonitor.models import CourseMonitor
 SLEEP_INTERVAL = 300 
 
 while True:
-    print "Fetch all again..."
-    course_monitor_list = CourseMonitor.objects.all()
+    try:
+        print "Fetch all again..."
+        course_monitor_list = CourseMonitor.objects.all()
 
-    for course in course_monitor_list:
-        course.fetch()
-    print "Sleep for %d second(s)..." % SLEEP_INTERVAL
-    time.sleep(SLEEP_INTERVAL)
+        for course in course_monitor_list:
+            course.fetch()
+        print "Sleep for %d second(s)..." % SLEEP_INTERVAL
+        time.sleep(SLEEP_INTERVAL)
+    except Exception as e:
+        errorlog(e)

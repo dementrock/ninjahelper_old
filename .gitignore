@@ -1,0 +1,6 @@
+*.log
+*.pot
+*.pyc
+*.sqlite
+*.swp
+*.swo
