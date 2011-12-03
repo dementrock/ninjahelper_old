@@ -13,6 +13,9 @@ class CoursePageMonitor(models.Model):
     shortname = models.CharField(max_length=30)
     hash_data = models.CharField(max_length=100, blank=True)
 
+    def __unicode__(self):
+        return '%s monitoring %s' % (str(self.user_profile), self.shortname)
+
     def fetch(self):
         url = self.url
         if getsize(url) > MAXIMUM_SIZE:
