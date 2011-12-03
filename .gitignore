@@ -4,3 +4,4 @@
 *.sqlite
 *.swp
 *.swo
+config.py
