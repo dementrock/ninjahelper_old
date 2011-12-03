@@ -13,10 +13,10 @@
     <div class="form-content">
         {% csrf_token %}
         <label for="username">Username</label> <br />
-        <input type="text" name="username" /> <br />
-        <label for="username">Password</label> <br />
-        <input type="password" name="password" /> <br />
-        <input type="submit" name="login" value="Log In" />
+        <input type="text" name="username" id="id_username"/> <br />
+        <label for="password">Password</label> <br />
+        <input type="password" name="password" id="id_username"/> <br />
+        <input type="submit" name="login" value="Log In" id="id_login"/>
     </div>
 </form>
 

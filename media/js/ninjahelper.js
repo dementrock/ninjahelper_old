@@ -7,7 +7,7 @@ $(function(){
         }
     }
     processing = function(note_id, processing_msg) {
-        $(note_id).html("<img id='processing' src='/media/processing.gif' />" + processing_msg);
+        $(note_id).html("<img id='processing' src='" + url_processing_gif + "' />" + processing_msg);
     }
     submit_form = function() {
         var form_submitted = false;
@@ -27,7 +27,7 @@ $(function(){
                     return false;
                 }
                 form_submitted = true;
-                $(note_id).html("<img id='processing' src='/media/processing.gif' />" + processing_msg);
+                processing(note_id, processing_msg);
                 $.post(submit_url, $(form_id).serialize(), function(data){
                     if (data.status == 'error') {
                         $(note_id).html(data.message);
