@@ -160,4 +160,6 @@ def errorlog(e, function=None):
     if DEBUG:
         print (error_str)
     else:
-        open('error_log', 'a').write(error_str)
+        log_file = open('error_log', 'a')
+        log_file.write(error_str)
+        log_file.close()
