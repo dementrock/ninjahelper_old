@@ -120,6 +120,7 @@ def fetch_course_data(user_profile):
 
     if user_profile.is_main_schedule_imported:
         return user_profile.course_list
+    print "fetching"
     user_schedule_page = _fetch_user_schedule_page(username, password)
     course_list = _fetch_course_data_from_page(user_schedule_page)
     print "Fetched course list"
@@ -136,16 +137,16 @@ def fetch_friend_data(user_profile):
 
     print "Fetching friend %s, %s" % (username, password)
     #user, user_profile = UserProfile.get_or_create_user(username=username, password=password)
-    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    #print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     if user_profile.is_friend_list_imported:
         return user_profile.friend_list
-    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    #print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     friend_list_page = _fetch_user_friend_list_page(username, password)
-    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    #print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     friend_list = _fetch_friend_list_from_page(friend_list_page)
-    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    #print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     user_profile.set_friend_list(friend_list)
-    print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
+    #print 'fetching friend', user, user_profile, user_profile.is_main_schedule_imported
     user_profile.save()
     return friend_list 
 
@@ -223,6 +224,7 @@ def get_friend_expression(friend_list):
     return friend_str
 
 def fetch_page_after_auth(username, password, next_url):
+    print username, password
     logout_url = 'https://secure.ninjacourses.com/account/logout/'
     login_url = 'https://secure.ninjacourses.com/account/login/?next=%s' % next_url
     br = Browser(file_wrapper=ResponseWrapper)

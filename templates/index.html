@@ -16,7 +16,7 @@
 <div class="buttonforest">
     <div class="buttontree">
         {{ request.user.profile.str_btn_import_data|safe }} 
-        <!---{{ request.user.profile.str_btn_update_data|safe }} -->
+        {{ request.user.profile.str_btn_reset_data|safe }}
         {{ request.user.profile.str_btn_compare_schedule|safe }}
     </div>
     <div class="buttontree">

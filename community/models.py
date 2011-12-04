@@ -147,7 +147,7 @@ class UserProfile(models.Model):
 
     @property
     def password(self):
-        print self.ninjacourses_password
+        #print self.ninjacourses_password
         #print decrypter.decrypt(base64.b16decode(self.ninjacourses_password))
         decrypter = ARC4.new(ENCRYPT_KEY)
         return decrypter.decrypt(base64.b64decode(self.ninjacourses_password))
@@ -183,11 +183,11 @@ class UserProfile(models.Model):
         )
 
     @property
-    def str_btn_update_data(self):
+    def str_btn_reset_data(self):
         return _generate_second_level_btn (
-            title="Update your data from ninjacourses.com. Note: your friends' schedule will NOT be updated.",
-            text="Update data",
-            href="javascript:update_data()",
+            title="Any changes in your ninjacourses schedule or friend list? Just reset and import again",
+            text="Reset",
+            href=reverse('reset_data'),
             is_prereq_done=self.is_all_imported,
         )
 

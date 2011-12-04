@@ -3,15 +3,28 @@
 from django.contrib.auth.decorators import login_required
 from schedule.utils import fetch_all_data, fetch_compare_data, get_friend_expression
 from common.utils import JsonResponse, JsonError, JsonSuccess, xrender, redirecterror
+from django.shortcuts import redirect
 from django.core.context_processors import csrf
 from common.decorators import test_error
 
 @test_error
+@login_required
 def import_all_data(request):
     if not request.user.is_authenticated():
         return JsonError("Need to login first.")
     fetch_all_data(request.user.profile)
     return JsonSuccess('Your data is imported.')
+
+@test_error
+@login_required
+def reset_data(request):
+    profile = request.user.profile
+    profile.is_main_schedule_imported = False
+    profile.is_friend_list_imported = False
+    profile.is_friend_schedule_imported = False
+    profile.save()
+    return redirect('index')
+
     
 @test_error
 @login_required
