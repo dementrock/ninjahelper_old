@@ -161,5 +161,5 @@ def errorlog(e, function=None):
         print (error_str)
     else:
         log_file = open('error_log', 'a')
-        log_file.write(error_str)
+        log_file.write(error_str + '\n')
         log_file.close()

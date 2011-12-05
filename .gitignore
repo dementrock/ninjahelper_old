@@ -4,4 +4,6 @@
 *.sqlite
 *.swp
 *.swo
+*.out
+*log*
 config.py

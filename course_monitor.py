@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))[:-12])
 
 from coursemonitor.models import CourseMonitor
+from common.utils import errorlog
 
 SLEEP_INTERVAL = 300 
 
