@@ -11,6 +11,7 @@ import string
 import random
 from django.core.urlresolvers import reverse
 from settings import MEDIA_HEADER
+from html2text import html2text
 
 ERROR_STATUS = {'status': 'error'}
 SUCCESS_STATUS = {'status': 'success'}

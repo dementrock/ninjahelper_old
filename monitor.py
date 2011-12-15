@@ -11,12 +11,15 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__))[:-12])
 from coursemonitor.models import CourseMonitor
 from coursepagemonitor.models import CoursePageMonitor
 from common.utils import errorlog
+from settings import DEBUG
 
 SLEEP_INTERVAL = 600
 
 LOG_FILE = 'log_monitor'
 
 def log(s):
+    if DEBUG:
+        print s
     if LOG_FILE:
         log_file = open(LOG_FILE, 'a')
         log_file.write(s + '\n')
