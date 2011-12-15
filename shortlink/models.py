@@ -7,4 +7,7 @@ class ShortLink(models.Model):
     shortname = models.CharField(max_length=100)
     url = models.URLField(max_length=100)
 
+    def __unicode__(self):
+        return "%s: link to %s" % (str(self.user_profile), self.shortname)
+
 

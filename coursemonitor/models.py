@@ -1,6 +1,6 @@
 from django.db import models
 import urllib
-from common.utils import send_message, send_email
+from common.utils import send_message, send_email, html2text
 from community.models import UserProfile
 
 # Create your models here.
@@ -18,6 +18,7 @@ class CourseMonitor(models.Model):
     has_waitlist = models.BooleanField(default=True)
     all_full = models.BooleanField(default=False)
 
+
     is_first_time = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -25,7 +26,7 @@ class CourseMonitor(models.Model):
 
     def fetch(self):
         # given a ccn, a cellphone number and a studentname
-        print "running?"
+        #print "running?"
         info_list, has_waitlist = _find_info(self.ccn)
         current_enroll, enroll_limit, current_waitlist, waitlist_limit = -1, -1, -1, -1
         all_full = False
@@ -43,10 +44,10 @@ class CourseMonitor(models.Model):
                 current_enroll, enroll_limit = info_list
             elif len(info_list) == 0:
                 all_full = True
-        print current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist
-        is_different = self.update(current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist)
+        #print current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist
+        is_different, different_list = self.update(current_enroll, enroll_limit, current_waitlist, waitlist_limit, all_full, has_waitlist)
         if is_different:
-            msg = "There has been a change of status in your monitoring course with CCN %d." % self.ccn
+            msg = "Change in course %d:\n%s" % (self.ccn, '; '.join(different_list) + '.')
             if self.user_profile.is_phone_set:
                 cell_mail = '%s@%s' % (self.user_profile.cellphone, self.user_profile.cell_mail)
                 send_message(toaddrs=cell_mail, msg=msg)
@@ -55,18 +56,54 @@ class CourseMonitor(models.Model):
 
 
     def update(self, *args):
-        assert len(args) == 6, "What??"
+
         name_list = ["current_enroll", "enroll_limit", "current_waitlist", "waitlist_limit", "all_full", "has_waitlist"]
+        friendly_name = {
+            "current_enroll": "current enrollment",
+            "enroll_limit": "enrollment limit",
+            "current_waitlist": "current waitlist",
+            "waitlist_limit": "waitlist limit",
+        }
         is_different = False
+        different_list = []
+
+        def num_or_no_info(x):
+            if x == -1:
+                return "(no info)"
+            else:
+                return str(x)
+
         for index in range(0, len(name_list)):
             arg = args[index]
             arg_name = name_list[index]
             if not self.is_first_time and hasattr(self, arg_name) and arg != getattr(self, arg_name):
                 is_different = True
+                if arg_name in friendly_name:
+                    different_list.append("%s changed from %s to %s" % (
+                        friendly_name[arg_name],
+                        num_or_no_info(getattr(self, arg_name)),
+                        num_or_no_info(arg),
+                    ))
+                else:
+                    if arg_name == "all_full":
+                        if arg: # Changed from not full to full
+                            diff = "course is now full"
+                        else:   # Changed from full to not full
+                            diff = "course now has available position or waitlist"
+                    elif arg_name == "has_waitlist": # Which should not frequently happen
+                        continue # This information is possibly duplicated. Won't need
+                        """
+                        if arg: # Changed from no waitlist to having waitlist
+                            diff = "course now has a waitlist"
+                        else:   # Changed from having waitlist to no waitlist
+                            diff = "course now has no waitlist" """
+                    else:
+                        continue
+                    different_list.append(diff)
             setattr(self, arg_name, arg)
         self.is_first_time = False
         self.save()
-        return is_different
+        return is_different, different_list
 
 def _analyze_num(s):
     l = len(s)
