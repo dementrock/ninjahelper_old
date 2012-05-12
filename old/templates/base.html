@@ -11,9 +11,7 @@
     <script src="{{ media_header }}/js/ninjahelper.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Rammetto+One' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Niconne&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="http://media.ninjacourses.com/css/style.css" />
-    <link rel="stylesheet" href="http://media.ninjacourses.com/css/ninjacourses.css" />
-    <link rel="stylesheet" href="{{ media_header }}/css/style.css" />
+    <link rel="stylesheet" href="{{ media_header }}/css/new.css" />
     {% block scripts %} {% endblock %}
   </head>
   <body>
@@ -30,13 +28,9 @@
       <div id="title">
         <h1><a href="/">Ninja Helper</a></h1>
       </div>
-      <ul id="nav">
-        <li><a href="http://ninjacourses.com">Go to Ninja Courses</a></li>
-      </ul>
       <div style="clear: both; height: 0px; width: 0px;"></div>
     </div>
     <div id="content">
-        <div class="welcome">{% ifloggedin %}Welcome, {{ request.user }}!{% else %}Welcome to Ninja Helper!{% endifloggedin %}</div>
         {% block content %} {% endblock %}
     </div>
   </body>

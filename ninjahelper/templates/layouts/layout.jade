@@ -1,0 +1,19 @@
+!!! 5
+html
+  head
+    meta(charset="utf-8")
+    meta(name="description", content="A messy set of tools for UC Berkeley students")
+    title Ninja Helper - 
+      block title
+    link(href=url_for('static', filename='bootstrap/css/bootstrap.css'), media='screen, projection', rel='stylesheet', type='text/css')
+    link(href=url_for('static', filename='stylesheets/screen.css'), media='screen, projection', rel='stylesheet', type='text/css')
+    script(type="text/javascript", src=url_for('static', filename='javascripts/jquery-1.7.1.js'))
+  body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          a.brand(href="#") Ninja Helper
+          .nav-collapse.collapse
+            ul.nav
+              li
+                a(href="#") About

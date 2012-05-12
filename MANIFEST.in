@@ -1,0 +1,2 @@
+recursive-include innostaa/templates *
+recursive-include innostaa/static *

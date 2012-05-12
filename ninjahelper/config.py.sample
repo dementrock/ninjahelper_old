@@ -1,0 +1,7 @@
+DEBUG = True
+
+MONGODB_HOST = "127.0.0.1"
+MONGODB_PORT = 27017
+MONGODB_DATABASE = "ninjahelper"
+
+SECRET_KEY = "secretkey" # replace with secret key
